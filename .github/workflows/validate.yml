@@ -25,8 +25,9 @@ jobs:
 
   hacs:
     name: HACS
-    # The HACS action refuses private repositories.
-    if: ${{ !github.event.repository.private }}
+    # The HACS action refuses private repositories. Scheduled runs carry no
+    # event payload to tell the visibility, so they skip it too.
+    if: ${{ github.event.repository && !github.event.repository.private }}
     runs-on: ubuntu-latest
     steps:
       - name: HACS validation
