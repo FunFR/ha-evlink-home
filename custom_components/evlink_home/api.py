@@ -12,6 +12,7 @@ import time
 from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import datetime
+from enum import StrEnum
 from http import HTTPStatus
 from pathlib import Path
 from typing import Any
@@ -66,16 +67,45 @@ class _Token:
     account_id: str
 
 
+class WallboxStatus(StrEnum):
+    """State of a Wallbox, in the snake case Home Assistant shows."""
+
+    UNDEFINED = "undefined"
+    CHARGING = "charging"
+    PLUGGED_IN = "plugged_in"
+    UNPLUGGED = "unplugged"
+    JOINING = "joining"
+    REBOOTING = "rebooting"
+    STOPPED = "stopped"
+    PAUSED = "paused"
+    ERROR = "error"
+    OFFLINE = "offline"
+    SCHEDULE_PAUSED = "schedule_paused"
+    TRIPPED = "tripped"
+    SUSPENDED_DSO = "suspended_dso"
+    SUSPENDED_EV = "suspended_ev"
+
+
+_STATUSES: dict[str, WallboxStatus] = {
+    "".join(word.capitalize() for word in status.split("_")): status
+    for status in WallboxStatus
+}
+"""Each status under the PascalCase name the cloud sends."""
+
+
 @dataclass(frozen=True, slots=True)
 class Wallbox:
-    """One Wallbox as the cloud reports it."""
+    """One Wallbox as the cloud reports it.
+
+    ``status`` is ``None`` for a cloud status the client does not know.
+    """
 
     device_id: str
     name: str
     model: str | None
     firmware: str | None
     serial_number: str | None
-    status: str
+    status: WallboxStatus | None
     session_energy_kwh: float | None
     next_scheduled_start: datetime | None
     next_scheduled_end: datetime | None
@@ -258,7 +288,7 @@ def _wallbox(record: Mapping[str, Any]) -> Wallbox:
         model=record.get("modelIdentifier"),
         firmware=record.get("firmwareVersion"),
         serial_number=record.get("serialNumber"),
-        status=str(record["status"]),
+        status=_STATUSES.get(str(record["status"])),
         session_energy_kwh=None if energy is None else float(energy),
         next_scheduled_start=_local_time(record.get("nextScheduledChargingDate")),
         next_scheduled_end=_local_time(record.get("nextScheduledChargingEndDate")),

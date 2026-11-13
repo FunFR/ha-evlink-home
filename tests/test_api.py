@@ -18,6 +18,7 @@ from custom_components.evlink_home.api import (
     InvalidCredentialsError,
     UnexpectedResponseError,
     Wallbox,
+    WallboxStatus,
     WiserHomeClient,
 )
 
@@ -92,7 +93,7 @@ async def test_get_wallboxes_logs_in_on_demand_and_returns_the_wallbox(
         model="EVH4A07N400F",
         firmware="2.0.7.0.0_f135",
         serial_number="REDACTED_serialNumber",
-        status="SchedulePaused",
+        status=WallboxStatus.SCHEDULE_PAUSED,
         session_energy_kwh=33.9,
         next_scheduled_start=datetime(2026, 11, 13, 22, 0),
         next_scheduled_end=datetime(2026, 11, 14, 6, 0),
@@ -323,10 +324,43 @@ async def test_unplugged_wallbox_has_no_session_values(
 
     [wallbox] = await client.get_wallboxes()
 
-    assert wallbox.status == "Unplugged"
+    assert wallbox.status is WallboxStatus.UNPLUGGED
     assert wallbox.session_energy_kwh is None
     assert wallbox.next_scheduled_start is None
     assert wallbox.next_scheduled_end is None
+
+
+@pytest.mark.parametrize(
+    ("cloud_status", "status"),
+    [
+        ("Undefined", "undefined"),
+        ("Charging", "charging"),
+        ("PluggedIn", "plugged_in"),
+        ("Unplugged", "unplugged"),
+        ("Joining", "joining"),
+        ("Rebooting", "rebooting"),
+        ("Stopped", "stopped"),
+        ("Paused", "paused"),
+        ("Error", "error"),
+        ("Offline", "offline"),
+        ("SchedulePaused", "schedule_paused"),
+        ("Tripped", "tripped"),
+        ("SuspendedDso", "suspended_dso"),
+        ("SuspendedEv", "suspended_ev"),
+        ("Overheated", None),
+    ],
+)
+async def test_wallbox_status_reads_the_cloud_status_in_snake_case(
+    cloud: aioresponses, client: WiserHomeClient, cloud_status: str, status: str | None
+) -> None:
+    [record] = json.loads(load_fixture("clouddevices.json"))
+    record["status"] = cloud_status
+    cloud.post(LOGIN_URL, status=200, body=login_body())
+    cloud.get(DEVICES_URL, status=200, body=json.dumps([record]))
+
+    [wallbox] = await client.get_wallboxes()
+
+    assert wallbox.status == status
 
 
 @pytest.mark.parametrize(

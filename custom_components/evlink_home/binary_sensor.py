@@ -13,29 +13,30 @@ from homeassistant.components.binary_sensor.const import BinarySensorDeviceClass
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
-from .const import STATUSES
+from .api import WallboxStatus
 from .coordinator import EvlinkHomeConfigEntry
 from .entity import EvlinkHomeEntity, async_add_wallbox_entities
 
 PARALLEL_UPDATES = 0
 
-_PLUGGED_IN = {
-    "charging",
-    "paused",
-    "plugged_in",
-    "schedule_paused",
-    "stopped",
-    "suspended_dso",
-    "suspended_ev",
-}
-_UNPLUGGED = {"unplugged"}
+_PLUGGED_IN = frozenset(
+    {
+        WallboxStatus.CHARGING,
+        WallboxStatus.PAUSED,
+        WallboxStatus.PLUGGED_IN,
+        WallboxStatus.SCHEDULE_PAUSED,
+        WallboxStatus.STOPPED,
+        WallboxStatus.SUSPENDED_DSO,
+        WallboxStatus.SUSPENDED_EV,
+    }
+)
 
 
-def _plugged_in(status: str | None) -> bool | None:
+def _plugged_in(status: WallboxStatus | None) -> bool | None:
     """Whether a car is plugged in, unknown when the status does not tell."""
     if status in _PLUGGED_IN:
         return True
-    if status in _UNPLUGGED:
+    if status is WallboxStatus.UNPLUGGED:
         return False
     return None
 
@@ -44,7 +45,7 @@ def _plugged_in(status: str | None) -> bool | None:
 class EvlinkHomeBinarySensorEntityDescription(BinarySensorEntityDescription):
     """Binary sensor read from the Wallbox status."""
 
-    is_on_fn: Callable[[str | None], bool | None]
+    is_on_fn: Callable[[WallboxStatus | None], bool | None]
 
 
 BINARY_SENSORS: tuple[EvlinkHomeBinarySensorEntityDescription, ...] = (
@@ -58,7 +59,7 @@ BINARY_SENSORS: tuple[EvlinkHomeBinarySensorEntityDescription, ...] = (
         key="charging",
         translation_key="charging",
         device_class=BinarySensorDeviceClass.BATTERY_CHARGING,
-        is_on_fn=lambda status: status == "charging",
+        is_on_fn=lambda status: status is WallboxStatus.CHARGING,
     ),
 )
 
@@ -87,4 +88,4 @@ class EvlinkHomeBinarySensor(EvlinkHomeEntity, BinarySensorEntity):
 
     @property
     def is_on(self) -> bool | None:
-        return self.entity_description.is_on_fn(STATUSES.get(self.wallbox.status))
+        return self.entity_description.is_on_fn(self.wallbox.status)
