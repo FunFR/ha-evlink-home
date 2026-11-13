@@ -1,12 +1,14 @@
 """Tests for the EVlink Home config entry lifecycle, through Home Assistant."""
 
+import asyncio
 import json
+from collections.abc import Awaitable, Callable
 from datetime import timedelta
 from typing import Any
 
 import aiohttp
 import pytest
-from aioresponses import aioresponses
+from aioresponses import CallbackResult, aioresponses
 from freezegun.api import FrozenDateTimeFactory
 from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
 from homeassistant.core import HomeAssistant
@@ -19,6 +21,7 @@ from pytest_homeassistant_custom_component.common import (
     load_fixture,
 )
 from pytest_homeassistant_custom_component.typing import WebSocketGenerator
+from yarl import URL
 
 from custom_components.evlink_home.api import WallboxStatus
 from custom_components.evlink_home.const import DOMAIN
@@ -26,10 +29,16 @@ from custom_components.evlink_home.const import DOMAIN
 from .common import DEVICE_ID, DEVICES_URL, LOGIN_URL, error_fixture, login_body
 
 
-async def poll(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:
-    freezer.tick(timedelta(seconds=30))
+async def wait(
+    hass: HomeAssistant, freezer: FrozenDateTimeFactory, seconds: float
+) -> None:
+    freezer.tick(timedelta(seconds=seconds))
     async_fire_time_changed(hass)
     await hass.async_block_till_done()
+
+
+async def poll(hass: HomeAssistant, freezer: FrozenDateTimeFactory) -> None:
+    await wait(hass, freezer, 30)
 
 
 def request_counts(cloud: aioresponses) -> dict[str, int]:
@@ -150,6 +159,7 @@ async def test_password_rejected_while_polling_asks_to_reauthenticate(
     await poll(hass, freezer)
     await poll(hass, freezer)
 
+    print("DEBUG", request_counts(cloud), hass.loop.time())
     assert not loaded_entry.runtime_data.last_update_success
     assert reauth_flows(hass, loaded_entry) == ["reauth_confirm"]
     assert (
@@ -157,6 +167,37 @@ async def test_password_rejected_while_polling_asks_to_reauthenticate(
         "The Wiser Home cloud rejected the email or password"
     ) in caplog.text
     assert request_counts(cloud) == {f"POST {LOGIN_URL}": 3, f"GET {DEVICES_URL}": 2}
+
+
+async def test_poll_slower_than_its_bound_counts_as_unreachable(
+    hass: HomeAssistant,
+    cloud: aioresponses,
+    loaded_entry: MockConfigEntry,
+    freezer: FrozenDateTimeFactory,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Each call answers within 20 s, but the refused token makes the poll last 40 s."""
+    keep_polling(loaded_entry)
+
+    def slow(status: int, body: str = "") -> Callable[..., Awaitable[CallbackResult]]:
+        async def answer(url: URL, **kwargs: Any) -> CallbackResult:
+            await asyncio.sleep(20)
+            return CallbackResult(status=status, body=body)
+
+        return answer
+
+    cloud.get(DEVICES_URL, callback=slow(401))
+    cloud.post(LOGIN_URL, callback=slow(200, login_body()))
+    cloud.get(DEVICES_URL, status=200, body=load_fixture("clouddevices.json"))
+    await poll(hass, freezer)
+    await wait(hass, freezer, 20)
+    await wait(hass, freezer, 20)
+
+    assert not loaded_entry.runtime_data.last_update_success
+    assert (
+        "Error fetching evlink_home data: The Wiser Home cloud is unreachable"
+    ) in caplog.text
+    assert request_counts(cloud) == {f"POST {LOGIN_URL}": 2, f"GET {DEVICES_URL}": 2}
 
 
 SECOND_DEVICE_ID = "11111111-1111-4111-8111-111111111111"
