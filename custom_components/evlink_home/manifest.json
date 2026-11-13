@@ -1,0 +1,14 @@
+{
+    "domain": "evlink_home",
+    "name": "EVlink Home",
+    "codeowners": [
+        "@FunFR"
+    ],
+    "config_flow": true,
+    "documentation": "https://github.com/FunFR/ha-evlink-home",
+    "integration_type": "hub",
+    "iot_class": "cloud_polling",
+    "issue_tracker": "https://github.com/FunFR/ha-evlink-home/issues",
+    "requirements": [],
+    "version": "0.0.0"
+}

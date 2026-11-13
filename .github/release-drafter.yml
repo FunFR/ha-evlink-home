@@ -1,0 +1,85 @@
+name-template: "v$RESOLVED_VERSION"
+tag-template: "v$RESOLVED_VERSION"
+prerelease: true
+
+autolabeler:
+  - label: "feature"
+    title:
+      - "/^feat(\\(.+\\))?:/i"
+  - label: "bug"
+    title:
+      - "/^fix(\\(.+\\))?:/i"
+  - label: "breaking"
+    title:
+      - "/^\\w+(\\(.+\\))?!:/i"
+  - label: "chore"
+    title:
+      - "/^(chore|docs|style|test|build)(\\(.+\\))?:/i"
+  - label: "ci"
+    title:
+      - "/^ci(\\(.+\\))?:/i"
+  - label: "refactor"
+    title:
+      - "/^(refactor|perf)(\\(.+\\))?:/i"
+  - label: "dependencies"
+    branch:
+      - "/^renovate\\//i"
+
+categories:
+  - title: "💥 Breaking Changes"
+    labels:
+      - "breaking"
+  - title: "🚀 Features"
+    labels:
+      - "feature"
+      - "enhancement"
+  - title: "🐛 Bug Fixes"
+    labels:
+      - "bug"
+      - "fix"
+  - title: "🧰 Maintenance"
+    labels:
+      - "chore"
+      - "ci"
+      - "dependencies"
+      - "refactor"
+    collapse-after: 5
+
+change-template: "- $TITLE (#$NUMBER) @$AUTHOR"
+change-title-escapes: '\<*_&'
+
+exclude-contributors:
+  - "FunFR"
+  - "renovate"
+  - "github-actions"
+  - "cursoragent"
+no-contributors-template: "_No external contributions in this release._"
+
+version-resolver:
+  major:
+    labels:
+      - "breaking"
+  minor:
+    labels:
+      - "feature"
+      - "enhancement"
+  patch:
+    labels:
+      - "bug"
+      - "fix"
+      - "chore"
+      - "ci"
+      - "dependencies"
+      - "refactor"
+  default: patch
+
+template: |
+  ## What's Changed
+
+  $CHANGES
+
+  ## 🙌 External Contributors
+
+  $CONTRIBUTORS
+
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION

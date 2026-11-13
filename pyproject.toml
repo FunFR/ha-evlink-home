@@ -1,0 +1,50 @@
+[project]
+name = "ha-evlink-home"
+version = "0.0.0"
+description = "Home Assistant integration for the Schneider EVlink Home Smart wallbox"
+requires-python = ">=3.14.2"
+authors = [{ name = "FunFR" }]
+license = { text = "Apache-2.0" }
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "pytest-homeassistant-custom-component>=0.13.375",
+    "aioresponses>=0.7.9",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.16.0",
+    "mypy>=2.3.0",
+    "pre-commit>=4.6.1",
+    "commitizen>=4.10.1",
+    "packaging>=24",
+    "pip-audit>=2.7",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 88
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "PL"]
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+exclude = ["^tests/"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+pythonpath = ["."]
+addopts = "--cov=custom_components.evlink_home --cov-report=term-missing --cov-report=xml"
+
+[tool.coverage.run]
+source = ["custom_components/evlink_home"]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 95
