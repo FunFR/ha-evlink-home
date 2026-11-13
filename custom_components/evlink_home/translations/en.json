@@ -1,1 +1,26 @@
-{}
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "Connect to Wiser Home",
+                "description": "Sign in with the Wiser Home account that controls your EVlink Home Wallbox.",
+                "data": {
+                    "email": "Email",
+                    "password": "Password"
+                },
+                "data_description": {
+                    "email": "The email address of your Wiser Home account.",
+                    "password": "The password of your Wiser Home account."
+                }
+            }
+        },
+        "error": {
+            "invalid_auth": "The email or password is incorrect.",
+            "cannot_connect": "Could not reach the Wiser Home cloud. Try again later.",
+            "unknown": "Unexpected error. Check the logs for details."
+        },
+        "abort": {
+            "already_configured": "This Wiser Home account is already configured."
+        }
+    }
+}
