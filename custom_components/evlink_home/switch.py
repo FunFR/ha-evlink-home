@@ -13,7 +13,7 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from .api import CannotConnectError, InvalidCredentialsError, WiserHomeError
 from .const import DOMAIN
 from .coordinator import EvlinkHomeConfigEntry
-from .entity import EvlinkHomeEntity
+from .entity import EvlinkHomeEntity, async_add_wallbox_entities
 
 PARALLEL_UPDATES = 1
 
@@ -34,9 +34,10 @@ async def async_setup_entry(
 ) -> None:
     """Add the Charging switch of every Wallbox."""
     coordinator = entry.runtime_data
-    async_add_entities(
-        EvlinkHomeChargingSwitch(coordinator, device_id, CHARGING)
-        for device_id in coordinator.data
+    async_add_wallbox_entities(
+        entry,
+        async_add_entities,
+        lambda device_id: [EvlinkHomeChargingSwitch(coordinator, device_id, CHARGING)],
     )
 
 

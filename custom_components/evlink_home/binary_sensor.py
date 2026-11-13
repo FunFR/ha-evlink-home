@@ -15,7 +15,7 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .const import STATUSES
 from .coordinator import EvlinkHomeConfigEntry
-from .entity import EvlinkHomeEntity
+from .entity import EvlinkHomeEntity, async_add_wallbox_entities
 
 PARALLEL_UPDATES = 0
 
@@ -70,10 +70,13 @@ async def async_setup_entry(
 ) -> None:
     """Add the binary sensors of every Wallbox of the account."""
     coordinator = entry.runtime_data
-    async_add_entities(
-        EvlinkHomeBinarySensor(coordinator, device_id, description)
-        for device_id in coordinator.data
-        for description in BINARY_SENSORS
+    async_add_wallbox_entities(
+        entry,
+        async_add_entities,
+        lambda device_id: [
+            EvlinkHomeBinarySensor(coordinator, device_id, description)
+            for description in BINARY_SENSORS
+        ],
     )
 
 
