@@ -15,7 +15,7 @@ Everything committed, and every issue, pull request or release note, is public. 
 
 Tests in `tests/` run against recorded cloud answers in `tests/fixtures/` and stay offline. `tests_integration/` holds read-only checks against the real cloud, run weekly by CI; keep them read-only. A Start or Stop sent to a real Wallbox needs its owner's go each time.
 
-Recorded answers cannot see a change on the cloud side, so before a release, smoke-test in a real Home Assistant with a real account: `docker compose up -d` serves one on `127.0.0.1:8123` with the integration mounted from `custom_components/`. The release is ready when the coordinator logs `success: True` with no `ERROR` or traceback, and every `evlink_home` entity holds a value rather than `unavailable` or `unknown`.
+Recorded answers cannot see a change on the cloud side, so before a release, smoke-test in a real Home Assistant with a real account: `docker compose up -d` serves one on `127.0.0.1:8123` with the integration mounted from `custom_components/`. The release is ready when the coordinator logs `success: True` with no `ERROR` or traceback, and every `evlink_home` entity holds a value rather than `unavailable` or `unknown`. The next scheduled start and end are the exception: the cloud sends none while a charge runs inside the schedule.
 
 ## Releases
 
