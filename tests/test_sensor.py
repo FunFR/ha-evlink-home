@@ -1,13 +1,27 @@
 """Tests for the EVlink Home sensors."""
 
+import json
+from typing import Any
+
 from aioresponses import aioresponses
 from freezegun.api import FrozenDateTimeFactory
 from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from pytest_homeassistant_custom_component.common import MockConfigEntry
+from homeassistant.core import HomeAssistant, State
+from pytest_homeassistant_custom_component.common import (
+    MockConfigEntry,
+    load_fixture,
+    mock_restore_cache_with_extra_data,
+)
 from syrupy.assertion import SnapshotAssertion
 
-from .common import UNPLUGGED, poll_record, snapshot_platform_entities
+from .common import (
+    DEVICES_URL,
+    LOGIN_URL,
+    UNPLUGGED,
+    login_body,
+    poll_record,
+    snapshot_platform_entities,
+)
 
 
 async def test_sensors_snapshot(
@@ -129,3 +143,58 @@ async def test_session_energy_follows_the_next_session(
     state = hass.states.get("sensor.redacted_name_session_energy")
     assert state is not None
     assert state.state == "0.05"
+
+
+SESSION_ENERGY = "sensor.redacted_name_session_energy"
+
+
+def restore_session_energy(hass: HomeAssistant, kwh: float) -> None:
+    """Store the Session energy Home Assistant saved before restarting."""
+    mock_restore_cache_with_extra_data(
+        hass,
+        [
+            (
+                State(SESSION_ENERGY, str(kwh)),
+                {"native_value": kwh, "native_unit_of_measurement": "kWh"},
+            )
+        ],
+    )
+
+
+async def set_up_with_record(
+    hass: HomeAssistant,
+    cloud: aioresponses,
+    entry: MockConfigEntry,
+    changes: dict[str, Any],
+) -> None:
+    records = json.loads(load_fixture("clouddevices.json"))
+    records[0].update(changes)
+    cloud.post(LOGIN_URL, status=200, body=login_body())
+    cloud.get(DEVICES_URL, status=200, body=json.dumps(records))
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+
+
+async def test_session_energy_restored_after_a_restart_while_unplugged(
+    hass: HomeAssistant, cloud: aioresponses, entry: MockConfigEntry
+) -> None:
+    restore_session_energy(hass, 12.5)
+
+    await set_up_with_record(hass, cloud, entry, UNPLUGGED)
+
+    state = hass.states.get(SESSION_ENERGY)
+    assert state is not None
+    assert state.state == "12.5"
+    assert state.attributes["state_class"] == "total_increasing"
+
+
+async def test_session_energy_after_a_restart_reads_the_cloud_total_first(
+    hass: HomeAssistant, cloud: aioresponses, entry: MockConfigEntry
+) -> None:
+    restore_session_energy(hass, 12.5)
+
+    await set_up_with_record(hass, cloud, entry, {})
+
+    state = hass.states.get(SESSION_ENERGY)
+    assert state is not None
+    assert state.state == "33.9"

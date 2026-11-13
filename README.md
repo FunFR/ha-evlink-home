@@ -77,7 +77,7 @@ Each Wallbox gets these entities:
 | --- | --- | --- |
 | Charging | Switch | On while the Wallbox charges the car (status `charging` or `suspended_ev`). Turning it on sends Start, turning it off sends Stop. Turning it on with no car plugged in shows an error and sends nothing. |
 | Status | Sensor | The state of the Wallbox, see the values below. |
-| Session energy | Sensor | Energy delivered during the current Charge session, in kWh. It keeps its last value once the car is unplugged, and starts again from zero with the next session. |
+| Session energy | Sensor | Energy delivered during the current Charge session, in kWh. It keeps its last value once the car is unplugged, also across Home Assistant restarts, and starts again from zero with the next session. |
 | Next scheduled start | Sensor | Next start of the charging schedule set in the Wiser Home app. |
 | Next scheduled end | Sensor | Next end of that schedule. |
 | Plugged in | Binary sensor | On while a car is plugged in. Unknown when the status does not tell, for example while the Wallbox is offline. |
@@ -145,7 +145,6 @@ automation:
 - **No Disable.** The integration cannot keep the Wallbox from charging when a car is plugged in: the Wallbox follows its own schedule and the Wiser Home app's settings. Turning the switch off stops charging while the Charge session goes on, so the Wallbox may charge again on its own schedule.
 - **Read-only schedule.** The schedule and the charging mode are read from the Wiser Home app and cannot be changed from Home Assistant. Charge history and cost are not available.
 - **Wallbox time zone.** The cloud sends scheduled times without a time zone. The integration assumes the Wallbox is in Home Assistant's time zone.
-- **Session energy after a restart.** After Home Assistant restarts, Session energy stays unknown while no car is plugged in.
 
 ## Troubleshooting
 
