@@ -1,0 +1,52 @@
+name: CodeQL
+
+# An explicit workflow rather than default setup: default setup skips pull
+# requests from forks, which a code scanning rule would then block forever.
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '19 15 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ actions, python ]
+    steps:
+      # Code scanning needs a public repository on GitHub Free; the analysis
+      # starts on its own once the repository is public.
+      - name: Check that code scanning is available
+        id: repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: echo "public=$(gh api "repos/$REPOSITORY" --jq '.private | not')" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        if: steps.repository.outputs.public == 'true'
+        with:
+          persist-credentials: false
+      - name: Initialize CodeQL
+        if: steps.repository.outputs.public == 'true'
+        uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: none
+      - name: Perform CodeQL analysis
+        if: steps.repository.outputs.public == 'true'
+        uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          category: /language:${{ matrix.language }}

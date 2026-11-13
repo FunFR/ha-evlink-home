@@ -25,12 +25,18 @@ jobs:
 
   hacs:
     name: HACS
-    # The HACS action refuses private repositories. Scheduled runs carry no
-    # event payload to tell the visibility, so they skip it too.
-    if: ${{ github.event.repository && !github.event.repository.private }}
     runs-on: ubuntu-latest
     steps:
+      # The HACS action refuses private repositories; it starts on its own
+      # once the repository is public.
+      - name: Check that the repository is public
+        id: repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: echo "public=$(gh api "repos/$REPOSITORY" --jq '.private | not')" >> "$GITHUB_OUTPUT"
       - name: HACS validation
+        if: steps.repository.outputs.public == 'true'
         uses: hacs/action@1ebf01c408f29afcb6406bd431bc98fd8cbb15aa # main
         with:
           category: integration
