@@ -4,11 +4,7 @@ on:
   push:
     branches:
       - main
-  # pull_request_target lets the autolabeler label pull requests from forks,
-  # where a pull_request token is read-only. No job checks out or runs code
-  # from the pull request: the autolabeler reads the title and branch name
-  # from the event and its configuration from the base branch.
-  pull_request_target: # zizmor: ignore[dangerous-triggers] labels only, never runs PR code
+  pull_request_target: # zizmor: ignore[dangerous-triggers] labels fork PRs, never runs PR code
     branches:
       - main
     types:
