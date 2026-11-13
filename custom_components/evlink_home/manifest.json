@@ -1,6 +1,9 @@
 {
     "domain": "evlink_home",
     "name": "EVlink Home",
+    "categories": [
+        "energy.ev_charging"
+    ],
     "codeowners": [
         "@FunFR"
     ],

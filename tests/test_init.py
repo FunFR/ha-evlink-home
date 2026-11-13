@@ -14,6 +14,7 @@ from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
+from homeassistant.loader import async_get_integration
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
@@ -284,3 +285,9 @@ async def test_wallbox_gone_from_the_account_can_be_removed(
 
     assert response["success"]
     assert not wallbox_device_exists(hass, loaded_entry)
+
+
+async def test_integration_is_listed_under_ev_charging(hass: HomeAssistant) -> None:
+    integration = await async_get_integration(hass, DOMAIN)
+
+    assert integration.manifest.get("categories") == ["energy.ev_charging"]
