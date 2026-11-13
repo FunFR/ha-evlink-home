@@ -1,1 +1,13 @@
-{}
+{
+  "exceptions": {
+    "cannot_connect": {
+      "message": "The Wiser Home cloud is unreachable"
+    },
+    "invalid_credentials": {
+      "message": "The Wiser Home cloud rejected the email or password"
+    },
+    "unexpected_response": {
+      "message": "The Wiser Home cloud sent an unexpected answer"
+    }
+  }
+}

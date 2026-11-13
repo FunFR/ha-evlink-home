@@ -7,6 +7,15 @@ from unittest.mock import Mock
 
 import aiohttp
 import pytest
+from aioresponses import aioresponses
+from freezegun.api import FrozenDateTimeFactory
+from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
+from homeassistant.core import HomeAssistant
+from pytest_homeassistant_custom_component.common import MockConfigEntry, load_fixture
+
+from custom_components.evlink_home.const import DOMAIN
+
+from .common import ACCOUNT_ID, DEVICES_URL, LOGIN_URL, login_body
 
 pytest_plugins = "pytest_homeassistant_custom_component"
 
@@ -33,3 +42,34 @@ def auto_enable_custom_integrations(
     enable_custom_integrations: None,
 ) -> Generator[None]:
     yield
+
+
+@pytest.fixture
+def cloud() -> Generator[aioresponses]:
+    with aioresponses() as mock:
+        yield mock
+
+
+@pytest.fixture
+def entry(hass: HomeAssistant) -> MockConfigEntry:
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        unique_id=ACCOUNT_ID,
+        data={CONF_EMAIL: "user@example.com", CONF_PASSWORD: "secret"},
+    )
+    entry.add_to_hass(hass)
+    return entry
+
+
+@pytest.fixture
+async def loaded_entry(
+    hass: HomeAssistant,
+    cloud: aioresponses,
+    entry: MockConfigEntry,
+    freezer: FrozenDateTimeFactory,
+) -> MockConfigEntry:
+    """Entry set up once time is frozen, so ticking it never expires the token."""
+    cloud.post(LOGIN_URL, status=200, body=login_body())
+    cloud.get(DEVICES_URL, status=200, body=load_fixture("clouddevices.json"))
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    return entry
