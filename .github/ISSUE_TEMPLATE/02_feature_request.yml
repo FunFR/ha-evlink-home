@@ -1,0 +1,36 @@
+name: Feature Request
+description: Suggest an idea for the integration
+title: "[FR] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature! The integration can only offer what the Wiser Home cloud exposes for the Wallbox.
+  - type: textarea
+    id: description
+    attributes:
+      label: Is your feature request related to a problem? Please describe.
+      description: What you are trying to do with your Wallbox, and what stops you today.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Describe the solution you'd like
+      description: What you would like the integration to do.
+    validations:
+      required: true
+  - type: dropdown
+    id: wiser_home_app
+    attributes:
+      label: Does the Wiser Home app offer it?
+      options:
+        - "Yes"
+        - "No"
+        - Not sure
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Describe alternatives you've considered
+      description: Other ways you have tried, such as automations or the Wiser Home app.
