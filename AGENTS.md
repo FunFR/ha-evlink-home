@@ -15,7 +15,12 @@ Everything committed, and every issue, pull request or release note, is public. 
 
 Tests run against recorded cloud answers in `tests/fixtures/` and stay offline. A Start or Stop sent to a real Wallbox needs its owner's go each time.
 
-To try a change in a real Home Assistant, `docker compose up -d` serves one on `127.0.0.1:8123` with the integration mounted from `custom_components/`.
+Recorded answers cannot see a change on the cloud side, so before a release, smoke-test in a real Home Assistant with a real account: `docker compose up -d` serves one on `127.0.0.1:8123` with the integration mounted from `custom_components/`. The release is ready when the coordinator logs `success: True` with no `ERROR` or traceback, and every `evlink_home` entity holds a value rather than `unavailable` or `unknown`.
+
+## Releases
+
+- A commit is breaking (`!`) only when it breaks an existing installation: an entity or `unique_id` removed or renamed, the domain changed, or a configuration step changed. release-drafter turns it into a major version.
+- A fix for a bug a user reported ships as a pre-release, promoted to latest once the reporter confirms it on their Wallbox. HACS and the Marketplace offer pre-releases only to users who opt in.
 
 ## Maintenance
 
