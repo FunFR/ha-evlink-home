@@ -55,6 +55,37 @@ class EvlinkHomeConfigFlow(ConfigFlow, domain=DOMAIN):
             step_id="user", data_schema=_CREDENTIALS_SCHEMA, errors=errors
         )
 
+    async def async_step_reauth(
+        self, entry_data: Mapping[str, Any]
+    ) -> ConfigFlowResult:
+        """Start reauthentication after the cloud rejected the password."""
+        return await self.async_step_reauth_confirm()
+
+    async def async_step_reauth_confirm(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Ask for the new password of the configured account."""
+        entry = self._get_reauth_entry()
+        email = entry.data[CONF_EMAIL]
+        errors: dict[str, str] = {}
+        if user_input is not None:
+            credentials = {CONF_EMAIL: email, CONF_PASSWORD: user_input[CONF_PASSWORD]}
+            account_id = await self._async_login(credentials, errors)
+            if account_id is not None:
+                await self.async_set_unique_id(account_id)
+                self._abort_if_unique_id_mismatch(reason="wrong_account")
+                return self.async_update_reload_and_abort(
+                    entry, data_updates=credentials
+                )
+        return self.async_show_form(
+            step_id="reauth_confirm",
+            data_schema=probatio.Schema(
+                {probatio.Required(CONF_PASSWORD): _PASSWORD_SELECTOR}
+            ),
+            description_placeholders={CONF_EMAIL: email},
+            errors=errors,
+        )
+
     async def _async_login(
         self, credentials: Mapping[str, Any], errors: dict[str, str]
     ) -> str | None:
