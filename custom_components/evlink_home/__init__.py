@@ -6,6 +6,7 @@ from homeassistant.core import HomeAssistant
 from .coordinator import EvlinkHomeConfigEntry, EvlinkHomeCoordinator
 
 PLATFORMS: list[Platform] = [
+    Platform.BINARY_SENSOR,
     Platform.SENSOR,
 ]
 

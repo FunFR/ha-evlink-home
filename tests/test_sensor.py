@@ -2,10 +2,21 @@
 
 from aioresponses import aioresponses
 from freezegun.api import FrozenDateTimeFactory
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from pytest_homeassistant_custom_component.common import MockConfigEntry
+from syrupy.assertion import SnapshotAssertion
 
-from .common import UNPLUGGED, poll_record
+from .common import UNPLUGGED, poll_record, snapshot_platform_entities
+
+
+async def test_sensors_snapshot(
+    hass: HomeAssistant,
+    cloud: aioresponses,
+    entry: MockConfigEntry,
+    snapshot: SnapshotAssertion,
+) -> None:
+    await snapshot_platform_entities(hass, cloud, entry, Platform.SENSOR, snapshot)
 
 
 async def test_status_reads_the_cloud_status_in_snake_case(

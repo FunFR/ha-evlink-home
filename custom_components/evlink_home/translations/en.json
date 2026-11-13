@@ -47,6 +47,14 @@
         }
     },
     "entity": {
+        "binary_sensor": {
+            "charging": {
+                "name": "Charging"
+            },
+            "plugged_in": {
+                "name": "Plugged in"
+            }
+        },
         "sensor": {
             "next_scheduled_end": {
                 "name": "Next scheduled end"
