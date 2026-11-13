@@ -17,9 +17,9 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from .api import (
     CannotConnectError,
     InvalidCredentialsError,
-    UnexpectedResponseError,
     Wallbox,
     WiserHomeClient,
+    WiserHomeError,
 )
 from .const import DOMAIN
 
@@ -57,6 +57,17 @@ class EvlinkHomeCoordinator(DataUpdateCoordinator[dict[str, Wallbox]]):
         return {wallbox.device_id: wallbox for wallbox in wallboxes}
 
 
+_ERROR_KEYS: dict[type[WiserHomeError], str] = {
+    CannotConnectError: "cannot_connect",
+    InvalidCredentialsError: "invalid_credentials",
+}
+
+
+def error_translation_key(err: WiserHomeError) -> str:
+    """Translation key of the message that explains a client error."""
+    return _ERROR_KEYS.get(type(err), "unexpected_response")
+
+
 @contextmanager
 def _cloud_errors() -> Iterator[None]:
     """Turn client errors into the coordinator's reauth and outage signals."""
@@ -64,13 +75,9 @@ def _cloud_errors() -> Iterator[None]:
         yield
     except InvalidCredentialsError as err:
         raise ConfigEntryAuthFailed(
-            translation_domain=DOMAIN, translation_key="invalid_credentials"
+            translation_domain=DOMAIN, translation_key=error_translation_key(err)
         ) from err
-    except CannotConnectError as err:
+    except WiserHomeError as err:
         raise UpdateFailed(
-            translation_domain=DOMAIN, translation_key="cannot_connect"
-        ) from err
-    except UnexpectedResponseError as err:
-        raise UpdateFailed(
-            translation_domain=DOMAIN, translation_key="unexpected_response"
+            translation_domain=DOMAIN, translation_key=error_translation_key(err)
         ) from err
