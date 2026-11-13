@@ -11,7 +11,7 @@ from syrupy.assertion import SnapshotAssertion
 from .common import UNPLUGGED, poll_record, snapshot_platform_entities
 
 PLUGGED_IN = "binary_sensor.redacted_name_plugged_in"
-CHARGING = "binary_sensor.redacted_name_charging"
+ENERGY_FLOWING = "binary_sensor.redacted_name_energy_flowing"
 
 
 def state_of(hass: HomeAssistant, entity_id: str) -> str:
@@ -31,14 +31,14 @@ async def test_binary_sensors_snapshot(
     )
 
 
-async def test_stopped_wallbox_is_plugged_in_and_not_charging(
+async def test_stopped_wallbox_is_plugged_in_with_no_energy_flowing(
     hass: HomeAssistant, loaded_entry: MockConfigEntry
 ) -> None:
     assert state_of(hass, PLUGGED_IN) == "on"
-    assert state_of(hass, CHARGING) == "off"
+    assert state_of(hass, ENERGY_FLOWING) == "off"
 
 
-async def test_unplugged_wallbox_is_neither_plugged_in_nor_charging(
+async def test_unplugged_wallbox_is_not_plugged_in_with_no_energy_flowing(
     hass: HomeAssistant,
     loaded_entry: MockConfigEntry,
     cloud: aioresponses,
@@ -47,21 +47,21 @@ async def test_unplugged_wallbox_is_neither_plugged_in_nor_charging(
     await poll_record(hass, cloud, freezer, UNPLUGGED)
 
     assert state_of(hass, PLUGGED_IN) == "off"
-    assert state_of(hass, CHARGING) == "off"
+    assert state_of(hass, ENERGY_FLOWING) == "off"
 
 
 @pytest.mark.usefixtures("loaded_entry")
 @pytest.mark.parametrize(
     ("status", "expected"),
     [
-        ("Charging", {PLUGGED_IN: "on", CHARGING: "on"}),
-        ("SuspendedEv", {PLUGGED_IN: "on", CHARGING: "off"}),
-        ("PluggedIn", {PLUGGED_IN: "on", CHARGING: "off"}),
-        ("Error", {PLUGGED_IN: "unknown", CHARGING: "off"}),
-        ("Offline", {PLUGGED_IN: "unknown", CHARGING: "off"}),
+        ("Charging", {PLUGGED_IN: "on", ENERGY_FLOWING: "on"}),
+        ("SuspendedEv", {PLUGGED_IN: "on", ENERGY_FLOWING: "off"}),
+        ("PluggedIn", {PLUGGED_IN: "on", ENERGY_FLOWING: "off"}),
+        ("Error", {PLUGGED_IN: "unknown", ENERGY_FLOWING: "off"}),
+        ("Offline", {PLUGGED_IN: "unknown", ENERGY_FLOWING: "off"}),
     ],
 )
-async def test_plugged_in_and_charging_follow_the_status(
+async def test_plugged_in_and_energy_flowing_follow_the_status(
     hass: HomeAssistant,
     cloud: aioresponses,
     freezer: FrozenDateTimeFactory,

@@ -56,8 +56,8 @@ BINARY_SENSORS: tuple[EvlinkHomeBinarySensorEntityDescription, ...] = (
         is_on_fn=_plugged_in,
     ),
     EvlinkHomeBinarySensorEntityDescription(
-        key="charging",
-        translation_key="charging",
+        key="energy_flowing",
+        translation_key="energy_flowing",
         device_class=BinarySensorDeviceClass.BATTERY_CHARGING,
         is_on_fn=lambda status: status is WallboxStatus.CHARGING,
     ),
