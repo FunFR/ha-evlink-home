@@ -2,6 +2,7 @@
 
 import json
 from datetime import timedelta
+from typing import Any
 
 import aiohttp
 import pytest
@@ -11,11 +12,13 @@ from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
+from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     async_fire_time_changed,
     load_fixture,
 )
+from pytest_homeassistant_custom_component.typing import WebSocketGenerator
 
 from custom_components.evlink_home.const import DOMAIN
 
@@ -188,3 +191,54 @@ async def test_wallbox_added_to_the_account_gets_its_device_and_entities(
         "sensor.garage_status",
         "switch.garage_charging",
     ]
+
+
+async def remove_wallbox_device(
+    hass: HomeAssistant, hass_ws_client: WebSocketGenerator, entry: MockConfigEntry
+) -> dict[str, Any]:
+    """Ask, as the device page's delete button does, to remove the Wallbox."""
+    assert await async_setup_component(hass, "config", {})
+    device = dr.async_get(hass).async_get_device_by_identifier(
+        (DOMAIN, DEVICE_ID), entry.entry_id
+    )
+    assert device is not None
+    client = await hass_ws_client(hass)
+    await client.send_json_auto_id(
+        {"type": "config/device_registry/remove", "device_id": device.id}
+    )
+    response: dict[str, Any] = await client.receive_json()
+    return response
+
+
+def wallbox_device_exists(hass: HomeAssistant, entry: MockConfigEntry) -> bool:
+    device = dr.async_get(hass).async_get_device_by_identifier(
+        (DOMAIN, DEVICE_ID), entry.entry_id
+    )
+    return device is not None
+
+
+async def test_wallbox_still_on_the_account_cannot_be_removed(
+    hass: HomeAssistant,
+    loaded_entry: MockConfigEntry,
+    hass_ws_client: WebSocketGenerator,
+) -> None:
+    response = await remove_wallbox_device(hass, hass_ws_client, loaded_entry)
+
+    assert not response["success"]
+    assert wallbox_device_exists(hass, loaded_entry)
+
+
+async def test_wallbox_gone_from_the_account_can_be_removed(
+    hass: HomeAssistant,
+    cloud: aioresponses,
+    loaded_entry: MockConfigEntry,
+    freezer: FrozenDateTimeFactory,
+    hass_ws_client: WebSocketGenerator,
+) -> None:
+    cloud.get(DEVICES_URL, status=200, body="[]")
+    await poll(hass, freezer)
+
+    response = await remove_wallbox_device(hass, hass_ws_client, loaded_entry)
+
+    assert response["success"]
+    assert not wallbox_device_exists(hass, loaded_entry)
