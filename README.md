@@ -17,7 +17,7 @@ EVlink Home is an unofficial custom integration for Home Assistant that monitors
 
 - **Start and Stop charging** from a switch, in automations, dashboards or voice assistants.
 - **Status** of the Wallbox, as the cloud reports it.
-- **Plugged in** and **Charging** binary sensors for simple automations.
+- **Plugged in** and **Energy flowing** binary sensors for simple automations.
 - **Session energy** in kWh, usable in the Energy dashboard.
 - **Next scheduled start and end** of the charging schedule set in the Wiser Home app.
 - Reauthentication, reconfiguration and diagnostics.
@@ -81,7 +81,7 @@ Each Wallbox gets these entities:
 | Next scheduled start | Sensor | Next start of the charging schedule set in the Wiser Home app. |
 | Next scheduled end | Sensor | Next end of that schedule. |
 | Plugged in | Binary sensor | On while a car is plugged in. Unknown when the status does not tell, for example while the Wallbox is offline. |
-| Charging | Binary sensor | On while the Wallbox charges the car (status `charging`). |
+| Energy flowing | Binary sensor | On while energy flows to the car (status `charging`). Off when the car does not draw power (`suspended_ev`), even though the Charging switch stays on. |
 
 Status values: `charging`, `plugged_in`, `unplugged`, `schedule_paused`, `paused`, `stopped`, `suspended_ev` (the car does not draw power), `suspended_dso` (suspended by the grid operator), `joining`, `rebooting`, `offline`, `error`, `tripped` and `undefined`. Only a few of them have been seen in practice.
 
@@ -112,7 +112,7 @@ automation:
         for: "00:10:00"
     conditions:
       - condition: state
-        entity_id: binary_sensor.wallbox_charging
+        entity_id: binary_sensor.wallbox_energy_flowing
         state: "off"
     actions:
       - action: notify.notify

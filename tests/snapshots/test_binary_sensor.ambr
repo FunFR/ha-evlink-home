@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: test_binary_sensors_snapshot[binary_sensor.redacted_name_charging-entry]
+# name: test_binary_sensors_snapshot[binary_sensor.redacted_name_energy_flowing-entry]
   EntityRegistryEntrySnapshot({
     'aliases': list([
       None,
@@ -13,7 +13,7 @@
     'disabled_by': None,
     'domain': 'binary_sensor',
     'entity_category': None,
-    'entity_id': 'binary_sensor.redacted_name_charging',
+    'entity_id': 'binary_sensor.redacted_name_energy_flowing',
     'has_entity_name': True,
     'hidden_by': None,
     'icon': None,
@@ -21,29 +21,29 @@
     'labels': set({
     }),
     'name': None,
-    'object_id_base': 'Charging',
+    'object_id_base': 'Energy flowing',
     'options': dict({
     }),
     'original_device_class': <BinarySensorDeviceClass.BATTERY_CHARGING: 'battery_charging'>,
     'original_icon': None,
-    'original_name': 'Charging',
+    'original_name': 'Energy flowing',
     'platform': 'evlink_home',
     'previous_unique_id': None,
     'suggested_object_id': None,
     'supported_features': 0,
-    'translation_key': 'charging',
-    'unique_id': '00000000-0000-4000-8000-000000000000_charging',
+    'translation_key': 'energy_flowing',
+    'unique_id': '00000000-0000-4000-8000-000000000000_energy_flowing',
     'unit_of_measurement': None,
   })
 # ---
-# name: test_binary_sensors_snapshot[binary_sensor.redacted_name_charging-state]
+# name: test_binary_sensors_snapshot[binary_sensor.redacted_name_energy_flowing-state]
   StateSnapshot({
     'attributes': ReadOnlyDict({
       <EntityStateAttribute.DEVICE_CLASS: 'device_class'>: 'battery_charging',
-      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'REDACTED_name Charging',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'REDACTED_name Energy flowing',
     }),
     'context': <ANY>,
-    'entity_id': 'binary_sensor.redacted_name_charging',
+    'entity_id': 'binary_sensor.redacted_name_energy_flowing',
     'last_changed': <ANY>,
     'last_reported': <ANY>,
     'last_updated': <ANY>,

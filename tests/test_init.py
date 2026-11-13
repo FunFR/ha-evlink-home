@@ -184,7 +184,7 @@ async def test_wallbox_added_to_the_account_gets_its_device_and_entities(
     assert device.name == "Garage"
     entities = er.async_entries_for_device(er.async_get(hass), device.id)
     assert sorted(entity.entity_id for entity in entities) == [
-        "binary_sensor.garage_charging",
+        "binary_sensor.garage_energy_flowing",
         "binary_sensor.garage_plugged_in",
         "sensor.garage_next_scheduled_end",
         "sensor.garage_next_scheduled_start",
