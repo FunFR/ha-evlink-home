@@ -12,6 +12,8 @@ from freezegun.api import FrozenDateTimeFactory
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
 from homeassistant.core import HomeAssistant
 from pytest_homeassistant_custom_component.common import MockConfigEntry, load_fixture
+from pytest_homeassistant_custom_component.syrupy import HomeAssistantSnapshotExtension
+from syrupy.assertion import SnapshotAssertion
 
 from custom_components.evlink_home.const import DOMAIN
 
@@ -35,6 +37,15 @@ if "stream_writer" in inspect.signature(_response_init).parameters:
         _response_init(self, *args, **kwargs)
 
     aiohttp.ClientResponse.__init__ = _patched_response_init  # type: ignore[method-assign]
+
+
+# syrupy and the Home Assistant plugin both define ``snapshot``; which one wins
+# depends on plugin load order, which differs between file systems. Defining it
+# here pins the Home Assistant extension, as Home Assistant core does.
+@pytest.fixture
+def snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
+    """Return the snapshot assertion with the Home Assistant extension."""
+    return snapshot.use_extension(HomeAssistantSnapshotExtension)
 
 
 @pytest.fixture(autouse=True)
