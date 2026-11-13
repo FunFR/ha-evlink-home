@@ -40,6 +40,13 @@
                 "github-actions"
             ],
             "semanticCommitType": "ci"
+        },
+        {
+            "matchDatasources": [
+                "pypi"
+            ],
+            "minimumReleaseAge": "3 days"
         }
-    ]
+    ],
+    "osvVulnerabilityAlerts": true
 }
