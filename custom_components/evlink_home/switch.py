@@ -40,7 +40,6 @@ class EvlinkHomeChargingSwitch(EvlinkHomeEntity, SwitchEntity):
     """On while the Wallbox charges the car; Start and Stop drive it."""
 
     _requested: bool | None = None
-    _refreshing = False
 
     @property
     def is_on(self) -> bool:
@@ -61,7 +60,7 @@ class EvlinkHomeChargingSwitch(EvlinkHomeEntity, SwitchEntity):
     async def _command(
         self, send: Callable[[str], Awaitable[None]], *, requested: bool
     ) -> None:
-        """Send the command, show ``requested`` until the next scheduled poll."""
+        """Send the command, show ``requested`` until a poll not made for a command."""
         try:
             await send(self.device_id)
         except WiserHomeError as err:
@@ -71,14 +70,10 @@ class EvlinkHomeChargingSwitch(EvlinkHomeEntity, SwitchEntity):
             ) from err
         self._requested = requested
         self.async_write_ha_state()
-        self._refreshing = True
-        try:
-            await self.coordinator.async_refresh()
-        finally:
-            self._refreshing = False
+        await self.coordinator.async_refresh_after_command()
 
     @callback
     def _handle_coordinator_update(self) -> None:
-        if not self._refreshing:
+        if not self.coordinator.refreshing_after_command:
             self._requested = None
         super()._handle_coordinator_update()
