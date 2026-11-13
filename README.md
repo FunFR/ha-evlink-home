@@ -11,7 +11,7 @@
 [![Validate][validate-shield]][validate]
 [![Release][release-workflow-shield]][release-workflow]
 
-EVlink Home is an unofficial custom integration for Home Assistant that monitors and controls a Schneider Electric EVlink Home Smart Wallbox. It uses the same cloud service as the Wiser Home app, so the Wallbox keeps its configuration and the Wiser Home app keeps working alongside Home Assistant.
+EVlink Home is an unofficial custom integration for Home Assistant that monitors and controls a Schneider Electric EVlink Home Smart Wallbox. It was built for a personal use case: control, from Home Assistant, what the Wiser Home app already lets you do with your own account. It uses the same cloud service as the Wiser Home app, so the Wallbox keeps its configuration and the Wiser Home app keeps working alongside Home Assistant.
 
 ## Features
 

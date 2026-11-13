@@ -1,4 +1,4 @@
-"""Async client for the Wiser Home cloud API that controls the Wallbox.
+"""Async client for the Wiser Home cloud service that controls the Wallbox.
 
 The module never imports Home Assistant: it only needs an aiohttp session.
 """
