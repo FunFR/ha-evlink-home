@@ -120,9 +120,6 @@ class EvlinkHomeSessionEnergySensor(EvlinkHomeEntity, SensorEntity):
 
     @callback
     def _handle_coordinator_update(self) -> None:
-        if (
-            self.device_id in self.coordinator.data
-            and self.wallbox.session_energy_kwh is not None
-        ):
+        if self.available and self.wallbox.session_energy_kwh is not None:
             self._attr_native_value = self.wallbox.session_energy_kwh
         super()._handle_coordinator_update()
