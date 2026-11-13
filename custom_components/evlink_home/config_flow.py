@@ -86,6 +86,28 @@ class EvlinkHomeConfigFlow(ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
+    async def async_step_reconfigure(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Change the credentials of the configured account."""
+        entry = self._get_reconfigure_entry()
+        errors: dict[str, str] = {}
+        if user_input is not None:
+            account_id = await self._async_login(user_input, errors)
+            if account_id is not None:
+                await self.async_set_unique_id(account_id)
+                self._abort_if_unique_id_mismatch(reason="wrong_account")
+                return self.async_update_reload_and_abort(
+                    entry, data_updates=user_input
+                )
+        return self.async_show_form(
+            step_id="reconfigure",
+            data_schema=self.add_suggested_values_to_schema(
+                _CREDENTIALS_SCHEMA, {CONF_EMAIL: entry.data[CONF_EMAIL]}
+            ),
+            errors=errors,
+        )
+
     async def _async_login(
         self, credentials: Mapping[str, Any], errors: dict[str, str]
     ) -> str | None:
