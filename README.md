@@ -47,9 +47,9 @@ EVlink Home is not in the Marketplace catalog yet: add this repository as a cust
 
 Adding a custom repository needs a GitHub connection. If the Marketplace is not connected yet, it asks you to connect GitHub with a code on the way.
 
-1. Select the button above and confirm adding the repository. Without the button: go to **Settings** > **Marketplace**, select **Add from link**, enter `https://github.com/FunFR/ha-evlink-home` and select **Add**.
-2. On the **EVlink Home** page, select **Install**, then **Install** again.
-3. If a repair asks for a restart, restart Home Assistant.
+1. Select the button above. Without the button: go to **Settings** > **Marketplace**, select **Add from link** in the upper-right corner, enter `https://github.com/FunFR/ha-evlink-home` and select **Add**.
+2. Open the **EVlink Home** page, select **Install**, review the version shown in the dialog, then select **Install**.
+3. The integration setup page opens once the installation is complete. If a repair under **Settings** > **System** > **Repairs** asks for a restart instead, restart Home Assistant from there.
 
 ### HACS (Home Assistant 2026.10)
 
@@ -186,7 +186,7 @@ Enable debug logging from the integration page (**Enable debug logging**), repro
 
 1. Go to **Settings** > **Devices & services** and select **EVlink Home**.
 2. Click the three dots next to the entry and select **Delete**.
-3. If you installed it from the Marketplace, open its page there and select **Uninstall** from the three dots menu. If you installed it with HACS, remove it from HACS and restart Home Assistant.
+3. If you installed it from the Marketplace, Home Assistant then asks whether to uninstall it. To uninstall it later, open its page in the Marketplace, select **Uninstall** from the three dots menu in the upper-right corner, and confirm. If a repair asks for a restart, restart Home Assistant from there. If you installed it with HACS, remove it from HACS and restart Home Assistant.
 
 Removing the integration deletes the stored credentials. The Wallbox and the Wiser Home app are not affected.
 
