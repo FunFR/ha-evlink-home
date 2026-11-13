@@ -40,7 +40,6 @@ class EvlinkHomeCoordinator(DataUpdateCoordinator[dict[str, Charger]]):
             config_entry=entry,
             name=DOMAIN,
             update_interval=timedelta(seconds=30),
-            always_update=False,
         )
         self.client = WiserHomeClient(
             async_get_clientsession(hass),

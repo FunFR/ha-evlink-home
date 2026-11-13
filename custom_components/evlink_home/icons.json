@@ -1,0 +1,12 @@
+{
+    "entity": {
+        "switch": {
+            "charging": {
+                "default": "mdi:ev-station",
+                "state": {
+                    "on": "mdi:battery-charging"
+                }
+            }
+        }
+    }
+}
