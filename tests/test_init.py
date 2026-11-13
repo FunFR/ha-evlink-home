@@ -56,9 +56,9 @@ async def test_entry_loads_the_wallboxes_and_unloads(
 
     assert await hass.config_entries.async_setup(entry.entry_id)
     assert entry.state is ConfigEntryState.LOADED
-    charger = entry.runtime_data.data[DEVICE_ID]
-    assert charger.status == "SchedulePaused"
-    assert charger.model == "EVH4A07N400F"
+    wallbox = entry.runtime_data.data[DEVICE_ID]
+    assert wallbox.status == "SchedulePaused"
+    assert wallbox.model == "EVH4A07N400F"
 
     assert await hass.config_entries.async_unload(entry.entry_id)
     assert entry.state is ConfigEntryState.NOT_LOADED

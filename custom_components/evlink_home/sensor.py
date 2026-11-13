@@ -18,7 +18,7 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.typing import StateType
 from homeassistant.util import dt as dt_util
 
-from .api import Charger
+from .api import Wallbox
 from .const import STATUSES
 from .coordinator import EvlinkHomeConfigEntry, EvlinkHomeCoordinator
 from .entity import EvlinkHomeEntity, async_add_wallbox_entities
@@ -30,7 +30,7 @@ PARALLEL_UPDATES = 0
 class EvlinkHomeSensorEntityDescription(SensorEntityDescription):
     """Sensor read from the Wallbox record."""
 
-    value_fn: Callable[[Charger], StateType | datetime]
+    value_fn: Callable[[Wallbox], StateType | datetime]
 
 
 def _home_time(value: datetime | None) -> datetime | None:
@@ -46,19 +46,19 @@ SENSORS: tuple[EvlinkHomeSensorEntityDescription, ...] = (
         translation_key="status",
         device_class=SensorDeviceClass.ENUM,
         options=list(STATUSES.values()),
-        value_fn=lambda charger: STATUSES.get(charger.status),
+        value_fn=lambda wallbox: STATUSES.get(wallbox.status),
     ),
     EvlinkHomeSensorEntityDescription(
         key="next_scheduled_start",
         translation_key="next_scheduled_start",
         device_class=SensorDeviceClass.TIMESTAMP,
-        value_fn=lambda charger: _home_time(charger.next_scheduled_start),
+        value_fn=lambda wallbox: _home_time(wallbox.next_scheduled_start),
     ),
     EvlinkHomeSensorEntityDescription(
         key="next_scheduled_end",
         translation_key="next_scheduled_end",
         device_class=SensorDeviceClass.TIMESTAMP,
-        value_fn=lambda charger: _home_time(charger.next_scheduled_end),
+        value_fn=lambda wallbox: _home_time(wallbox.next_scheduled_end),
     ),
 )
 
@@ -100,7 +100,7 @@ class EvlinkHomeSensor(EvlinkHomeEntity, SensorEntity):
 
     @property
     def native_value(self) -> StateType | datetime:
-        return self.entity_description.value_fn(self.charger)
+        return self.entity_description.value_fn(self.wallbox)
 
 
 class EvlinkHomeSessionEnergySensor(EvlinkHomeEntity, SensorEntity):
@@ -117,13 +117,13 @@ class EvlinkHomeSessionEnergySensor(EvlinkHomeEntity, SensorEntity):
         description: SensorEntityDescription,
     ) -> None:
         super().__init__(coordinator, device_id, description)
-        self._attr_native_value = self.charger.session_energy_kwh
+        self._attr_native_value = self.wallbox.session_energy_kwh
 
     @callback
     def _handle_coordinator_update(self) -> None:
         if (
             self.device_id in self.coordinator.data
-            and self.charger.session_energy_kwh is not None
+            and self.wallbox.session_energy_kwh is not None
         ):
-            self._attr_native_value = self.charger.session_energy_kwh
+            self._attr_native_value = self.wallbox.session_energy_kwh
         super()._handle_coordinator_update()

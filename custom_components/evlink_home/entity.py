@@ -10,7 +10,7 @@ from homeassistant.helpers.entity import Entity, EntityDescription
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .api import Charger
+from .api import Wallbox
 from .const import DOMAIN
 from .coordinator import EvlinkHomeConfigEntry, EvlinkHomeCoordinator
 
@@ -54,14 +54,14 @@ class EvlinkHomeEntity(CoordinatorEntity[EvlinkHomeCoordinator]):
         self.entity_description = description
         self.device_id = device_id
         self._attr_unique_id = f"{device_id}_{description.key}"
-        charger = coordinator.data[device_id]
+        wallbox = coordinator.data[device_id]
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, device_id)},
-            name=charger.name,
+            name=wallbox.name,
             manufacturer="Schneider Electric",
-            model=charger.model,
-            sw_version=charger.firmware,
-            serial_number=charger.serial_number,
+            model=wallbox.model,
+            sw_version=wallbox.firmware,
+            serial_number=wallbox.serial_number,
         )
 
     @property
@@ -69,6 +69,6 @@ class EvlinkHomeEntity(CoordinatorEntity[EvlinkHomeCoordinator]):
         return super().available and self.device_id in self.coordinator.data
 
     @property
-    def charger(self) -> Charger:
+    def wallbox(self) -> Wallbox:
         """The Wallbox record of the last poll."""
         return self.coordinator.data[self.device_id]

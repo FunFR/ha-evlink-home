@@ -87,4 +87,4 @@ class EvlinkHomeBinarySensor(EvlinkHomeEntity, BinarySensorEntity):
 
     @property
     def is_on(self) -> bool | None:
-        return self.entity_description.is_on_fn(STATUSES.get(self.charger.status))
+        return self.entity_description.is_on_fn(STATUSES.get(self.wallbox.status))

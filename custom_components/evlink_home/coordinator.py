@@ -16,9 +16,9 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 
 from .api import (
     CannotConnectError,
-    Charger,
     InvalidCredentialsError,
     UnexpectedResponseError,
+    Wallbox,
     WiserHomeClient,
 )
 from .const import DOMAIN
@@ -28,7 +28,7 @@ _LOGGER = logging.getLogger(__name__)
 type EvlinkHomeConfigEntry = ConfigEntry[EvlinkHomeCoordinator]
 
 
-class EvlinkHomeCoordinator(DataUpdateCoordinator[dict[str, Charger]]):
+class EvlinkHomeCoordinator(DataUpdateCoordinator[dict[str, Wallbox]]):
     """Wallboxes of one Wiser Home account, keyed by device id."""
 
     config_entry: EvlinkHomeConfigEntry
@@ -51,10 +51,10 @@ class EvlinkHomeCoordinator(DataUpdateCoordinator[dict[str, Charger]]):
         with _cloud_errors():
             await self.client.login()
 
-    async def _async_update_data(self) -> dict[str, Charger]:
+    async def _async_update_data(self) -> dict[str, Wallbox]:
         with _cloud_errors():
-            chargers = await self.client.get_chargers()
-        return {charger.device_id: charger for charger in chargers}
+            wallboxes = await self.client.get_wallboxes()
+        return {wallbox.device_id: wallbox for wallbox in wallboxes}
 
 
 @contextmanager
