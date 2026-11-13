@@ -28,7 +28,7 @@ Renovate maintains the repository on its own, so every change stays valid for mo
 
 - Derive versions from a declared source. CI runs on the Python series of the `requires-python` floor, which follows Home Assistant's.
 - For a problem owned upstream (a Home Assistant pin, a broken release), fix the cause or wait for the upstream fix. A pin or override that someone must remember to remove is rot.
-- The `Audit` job runs `pip-audit` outside pull requests on purpose: a vulnerability in a version Home Assistant pins stays visible without holding dependency updates.
+- The `Audit` workflow runs `pip-audit` outside pull requests on purpose: a vulnerability in a version Home Assistant pins stays visible without holding dependency updates.
 
 ## Checks
 

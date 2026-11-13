@@ -1,0 +1,36 @@
+name: Audit
+
+# Not run on pull requests: a vulnerability in a version Home Assistant pins
+# can only wait for its upstream fix and must not hold dependency updates.
+# A workflow of its own keeps the Test badge about the tests.
+on:
+  push:
+    branches: [ main ]
+  schedule:
+    - cron: '0 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Install uv
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+      - name: Use the Python series of the requires-python floor
+        run: |
+          floor="$(uv run --no-project --with packaging python scripts/print_requires_python_floor.py)"
+          echo "UV_PYTHON=${floor%.*}" >> "$GITHUB_ENV"
+      - name: Scan dev dependencies for known vulnerabilities
+        run: |
+          uv export --only-group dev --no-hashes --no-emit-project -o requirements-audit.txt
+          uv run --frozen pip-audit -r requirements-audit.txt --disable-pip --no-deps
