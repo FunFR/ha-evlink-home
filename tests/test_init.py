@@ -6,7 +6,7 @@ import aiohttp
 import pytest
 from aioresponses import aioresponses
 from freezegun.api import FrozenDateTimeFactory
-from homeassistant.config_entries import ConfigEntryState
+from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
 from homeassistant.core import HomeAssistant
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
@@ -27,6 +27,12 @@ def request_counts(cloud: aioresponses) -> dict[str, int]:
     return {
         f"{method} {url}": len(sent) for (method, url), sent in cloud.requests.items()
     }
+
+
+def reauth_flows(hass: HomeAssistant, entry: MockConfigEntry) -> list[str]:
+    return [
+        flow["step_id"] for flow in entry.async_get_active_flows(hass, {SOURCE_REAUTH})
+    ]
 
 
 def keep_polling(entry: MockConfigEntry) -> None:
@@ -60,6 +66,7 @@ async def test_rejected_password_at_setup_asks_to_reauthenticate(
 
     assert entry.state is ConfigEntryState.SETUP_ERROR
     assert entry.reason == "The Wiser Home cloud rejected the email or password"
+    assert reauth_flows(hass, entry) == ["reauth_confirm"]
     assert request_counts(cloud) == {f"POST {LOGIN_URL}": 1}
 
 
@@ -117,7 +124,7 @@ async def test_cloud_outage_is_logged_once_and_its_recovery_once(
     assert request_counts(cloud) == {f"POST {LOGIN_URL}": 1, f"GET {DEVICES_URL}": 4}
 
 
-async def test_password_rejected_while_polling_stops_polling(
+async def test_password_rejected_while_polling_asks_to_reauthenticate(
     hass: HomeAssistant,
     cloud: aioresponses,
     loaded_entry: MockConfigEntry,
@@ -135,6 +142,7 @@ async def test_password_rejected_while_polling_stops_polling(
     await poll(hass, freezer)
 
     assert not loaded_entry.runtime_data.last_update_success
+    assert reauth_flows(hass, loaded_entry) == ["reauth_confirm"]
     assert (
         "Authentication failed while fetching evlink_home data: "
         "The Wiser Home cloud rejected the email or password"
