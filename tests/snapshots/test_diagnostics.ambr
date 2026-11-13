@@ -1,0 +1,186 @@
+# serializer version: 1
+# name: test_diagnostics_hide_the_account_and_the_wallbox_identity
+  dict({
+    'chargers': list([
+      dict({
+        'authorisationStatus': False,
+        'authorisedModeSupported': False,
+        'chargeAuthorisationStatus': None,
+        'chargerModel': 'Aurora',
+        'chargingFinishedDate': None,
+        'chargingMode': 'UserDefined',
+        'chargingStartedDate': '2026-11-13T00:21:52',
+        'cheapSchedules': list([
+          dict({
+            'off': '2026-11-14T06:00:00',
+            'on': '2026-11-13T22:00:00',
+          }),
+        ]),
+        'cloudDeviceId': '**REDACTED**',
+        'cost': 4.4448,
+        'currency': 'EUR',
+        'deviceId': '**REDACTED**',
+        'energyUsageKwh': 33.9,
+        'equipmentOptimisedSchedule': None,
+        'firmwareVersion': '2.0.7.0.0_f135',
+        'greenSchedules': None,
+        'hasTariffInfo': False,
+        'hasValidSchedules': True,
+        'hubDeviceId': '**REDACTED**',
+        'hubEvseId': '**REDACTED**',
+        'modelIdentifier': 'EVH4A07N400F',
+        'name': '**REDACTED**',
+        'nextScheduledChargingDate': '2026-11-13T22:00:00',
+        'nextScheduledChargingEndDate': '2026-11-14T06:00:00',
+        'pcmEnabled': False,
+        'pcmSupported': False,
+        'productIdentifier': '**REDACTED**',
+        'productType': 'EvCharger',
+        'schedulingDetails': dict({
+          'EquipmentId': '**REDACTED**',
+          'Friday': list([
+            dict({
+              'ControlState': 'Unknown',
+              'Hour': 6,
+              'Minute': 0,
+              'Second': 0,
+              'State': False,
+            }),
+            dict({
+              'ControlState': 'Unknown',
+              'Hour': 22,
+              'Minute': 0,
+              'Second': 0,
+              'State': True,
+            }),
+          ]),
+          'IsValid': True,
+          'Monday': list([
+            dict({
+              'ControlState': 'Unknown',
+              'Hour': 6,
+              'Minute': 0,
+              'Second': 0,
+              'State': False,
+            }),
+            dict({
+              'ControlState': 'Unknown',
+              'Hour': 22,
+              'Minute': 0,
+              'Second': 0,
+              'State': True,
+            }),
+          ]),
+          'Saturday': list([
+            dict({
+              'ControlState': 'Unknown',
+              'Hour': 6,
+              'Minute': 0,
+              'Second': 0,
+              'State': False,
+            }),
+            dict({
+              'ControlState': 'Unknown',
+              'Hour': 22,
+              'Minute': 0,
+              'Second': 0,
+              'State': True,
+            }),
+          ]),
+          'Sunday': list([
+            dict({
+              'ControlState': 'Unknown',
+              'Hour': 6,
+              'Minute': 0,
+              'Second': 0,
+              'State': False,
+            }),
+            dict({
+              'ControlState': 'Unknown',
+              'Hour': 22,
+              'Minute': 0,
+              'Second': 0,
+              'State': True,
+            }),
+          ]),
+          'Thursday': list([
+            dict({
+              'ControlState': 'Unknown',
+              'Hour': 6,
+              'Minute': 0,
+              'Second': 0,
+              'State': False,
+            }),
+            dict({
+              'ControlState': 'Unknown',
+              'Hour': 22,
+              'Minute': 0,
+              'Second': 0,
+              'State': True,
+            }),
+          ]),
+          'Tuesday': list([
+            dict({
+              'ControlState': 'Unknown',
+              'Hour': 6,
+              'Minute': 0,
+              'Second': 0,
+              'State': False,
+            }),
+            dict({
+              'ControlState': 'Unknown',
+              'Hour': 22,
+              'Minute': 0,
+              'Second': 0,
+              'State': True,
+            }),
+          ]),
+          'Wednesday': list([
+            dict({
+              'ControlState': 'Unknown',
+              'Hour': 6,
+              'Minute': 0,
+              'Second': 0,
+              'State': False,
+            }),
+            dict({
+              'ControlState': 'Unknown',
+              'Hour': 22,
+              'Minute': 0,
+              'Second': 0,
+              'State': True,
+            }),
+          ]),
+        }),
+        'serialNumber': '**REDACTED**',
+        'status': 'SchedulePaused',
+        'vendor': 'Schneider Electric',
+        'wiFiEncryptionType': 'None',
+        'wiFiHidden': False,
+        'wiFiPassword': '**REDACTED**',
+        'wiFiSsid': '**REDACTED**',
+      }),
+    ]),
+    'entry': dict({
+      'data': dict({
+        'email': '**REDACTED**',
+        'password': '**REDACTED**',
+      }),
+      'disabled_by': None,
+      'discovery_keys': dict({
+      }),
+      'domain': 'evlink_home',
+      'minor_version': 1,
+      'options': dict({
+      }),
+      'pref_disable_new_entities': False,
+      'pref_disable_polling': False,
+      'source': 'user',
+      'subentries': list([
+      ]),
+      'title': '**REDACTED**',
+      'unique_id': '**REDACTED**',
+      'version': 1,
+    }),
+  })
+# ---
