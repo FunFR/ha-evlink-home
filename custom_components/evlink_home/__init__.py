@@ -5,7 +5,9 @@ from homeassistant.core import HomeAssistant
 
 from .coordinator import EvlinkHomeConfigEntry, EvlinkHomeCoordinator
 
-PLATFORMS: list[Platform] = []
+PLATFORMS: list[Platform] = [
+    Platform.SENSOR,
+]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: EvlinkHomeConfigEntry) -> bool:
