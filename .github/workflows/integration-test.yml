@@ -1,0 +1,36 @@
+name: Integration Test
+
+# Weekly read-only check against the real cloud service: it catches a change
+# on the cloud side that the recorded answers in tests/ cannot show.
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  integration-test:
+    name: Integration Test
+    runs-on: ubuntu-latest
+    env:
+      WISER_HOME_USERNAME: ${{ secrets.WISER_HOME_USERNAME }}
+      WISER_HOME_PASSWORD: ${{ secrets.WISER_HOME_PASSWORD }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Install uv
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+      - name: Use the Python series of the requires-python floor
+        run: |
+          floor="$(uv run --no-project --with packaging python scripts/print_requires_python_floor.py)"
+          echo "UV_PYTHON=${floor%.*}" >> "$GITHUB_ENV"
+      - name: Install dependencies
+        run: uv sync --frozen
+      - name: Run the read-only checks against the cloud
+        run: uv run pytest tests_integration -p no:homeassistant --no-cov
