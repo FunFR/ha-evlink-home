@@ -1,0 +1,41 @@
+name: Release
+
+on:
+  release:
+    types:
+      - published
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and upload release asset
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Extract version from tag
+        id: version
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          VERSION="${TAG#v}"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Inject version into manifest.json
+        run: |
+          cd custom_components/evlink_home
+          jq --arg v "${{ steps.version.outputs.version }}" '.version = $v' manifest.json > manifest.tmp
+          mv manifest.tmp manifest.json
+
+      - name: Build zip
+        run: |
+          cd custom_components/evlink_home
+          zip -r ../../evlink_home.zip . -x '*.pyc' -x '__pycache__/*'
+
+      - name: Upload zip to release
+        uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
+        with:
+          files: evlink_home.zip

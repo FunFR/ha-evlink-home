@@ -1,0 +1,160 @@
+[
+  {
+    "hubEvseId": 123456,
+    "vendor": "Schneider Electric",
+    "status": "SchedulePaused",
+    "chargingStartedDate": "2026-11-13T00:21:52",
+    "chargingFinishedDate": null,
+    "nextScheduledChargingDate": "2026-11-13T22:00:00",
+    "nextScheduledChargingEndDate": "2026-11-14T06:00:00",
+    "energyUsageKwh": 33.9,
+    "cost": 4.4448,
+    "currency": "EUR",
+    "chargingMode": "UserDefined",
+    "schedulingDetails": {
+      "EquipmentId": "REDACTED_EquipmentId",
+      "IsValid": true,
+      "Sunday": [
+        {
+          "State": false,
+          "Hour": 6,
+          "Minute": 0,
+          "Second": 0,
+          "ControlState": "Unknown"
+        },
+        {
+          "State": true,
+          "Hour": 22,
+          "Minute": 0,
+          "Second": 0,
+          "ControlState": "Unknown"
+        }
+      ],
+      "Monday": [
+        {
+          "State": false,
+          "Hour": 6,
+          "Minute": 0,
+          "Second": 0,
+          "ControlState": "Unknown"
+        },
+        {
+          "State": true,
+          "Hour": 22,
+          "Minute": 0,
+          "Second": 0,
+          "ControlState": "Unknown"
+        }
+      ],
+      "Tuesday": [
+        {
+          "State": false,
+          "Hour": 6,
+          "Minute": 0,
+          "Second": 0,
+          "ControlState": "Unknown"
+        },
+        {
+          "State": true,
+          "Hour": 22,
+          "Minute": 0,
+          "Second": 0,
+          "ControlState": "Unknown"
+        }
+      ],
+      "Wednesday": [
+        {
+          "State": false,
+          "Hour": 6,
+          "Minute": 0,
+          "Second": 0,
+          "ControlState": "Unknown"
+        },
+        {
+          "State": true,
+          "Hour": 22,
+          "Minute": 0,
+          "Second": 0,
+          "ControlState": "Unknown"
+        }
+      ],
+      "Thursday": [
+        {
+          "State": false,
+          "Hour": 6,
+          "Minute": 0,
+          "Second": 0,
+          "ControlState": "Unknown"
+        },
+        {
+          "State": true,
+          "Hour": 22,
+          "Minute": 0,
+          "Second": 0,
+          "ControlState": "Unknown"
+        }
+      ],
+      "Friday": [
+        {
+          "State": false,
+          "Hour": 6,
+          "Minute": 0,
+          "Second": 0,
+          "ControlState": "Unknown"
+        },
+        {
+          "State": true,
+          "Hour": 22,
+          "Minute": 0,
+          "Second": 0,
+          "ControlState": "Unknown"
+        }
+      ],
+      "Saturday": [
+        {
+          "State": false,
+          "Hour": 6,
+          "Minute": 0,
+          "Second": 0,
+          "ControlState": "Unknown"
+        },
+        {
+          "State": true,
+          "Hour": 22,
+          "Minute": 0,
+          "Second": 0,
+          "ControlState": "Unknown"
+        }
+      ]
+    },
+    "hasTariffInfo": false,
+    "greenSchedules": null,
+    "cheapSchedules": [
+      {
+        "on": "2026-11-13T22:00:00",
+        "off": "2026-11-14T06:00:00"
+      }
+    ],
+    "hasValidSchedules": true,
+    "chargerModel": "Aurora",
+    "wiFiPassword": null,
+    "wiFiSsid": null,
+    "wiFiEncryptionType": "None",
+    "wiFiHidden": false,
+    "firmwareVersion": "2.0.7.0.0_f135",
+    "pcmSupported": false,
+    "pcmEnabled": false,
+    "authorisationStatus": false,
+    "authorisedModeSupported": false,
+    "chargeAuthorisationStatus": null,
+    "equipmentOptimisedSchedule": null,
+    "hubDeviceId": 123456,
+    "cloudDeviceId": 123456,
+    "deviceId": "00000000-0000-4000-8000-000000000000",
+    "name": "REDACTED_name",
+    "serialNumber": "REDACTED_serialNumber",
+    "productType": "EvCharger",
+    "productIdentifier": "REDACTED_productIdentifier",
+    "modelIdentifier": "EVH4A07N400F"
+  }
+]
