@@ -67,7 +67,7 @@ The integration checks the credentials before creating the entry. Each Wiser Hom
 
 The integration has no options. To change the email or the password later, open the integration and select **Reconfigure**. The new credentials must belong to the same Wiser Home account.
 
-If the cloud rejects the password, for example after you changed it in the Wiser Home app, Home Assistant asks you to sign in again. The integration does not retry a rejected password on its own, so it never locks your account.
+If the cloud rejects the password, for example after you changed it in the Wiser Home app, Home Assistant asks you to sign in again. The integration does not retry a rejected password on its own.
 
 ## Entities
 
