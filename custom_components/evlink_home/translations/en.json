@@ -46,6 +46,38 @@
             "wrong_account": "These credentials belong to another Wiser Home account than the one configured."
         }
     },
+    "entity": {
+        "sensor": {
+            "next_scheduled_end": {
+                "name": "Next scheduled end"
+            },
+            "next_scheduled_start": {
+                "name": "Next scheduled start"
+            },
+            "session_energy": {
+                "name": "Session energy"
+            },
+            "status": {
+                "name": "Status",
+                "state": {
+                    "charging": "Charging",
+                    "error": "Error",
+                    "joining": "Joining",
+                    "offline": "Offline",
+                    "paused": "Paused",
+                    "plugged_in": "Plugged in",
+                    "rebooting": "Rebooting",
+                    "schedule_paused": "Schedule paused",
+                    "stopped": "Stopped",
+                    "suspended_dso": "Suspended by the grid",
+                    "suspended_ev": "Suspended by the car",
+                    "tripped": "Tripped",
+                    "undefined": "Undefined",
+                    "unplugged": "Unplugged"
+                }
+            }
+        }
+    },
     "exceptions": {
         "cannot_connect": {
             "message": "The Wiser Home cloud is unreachable"
