@@ -2,13 +2,41 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable, Iterable
+
+from homeassistant.core import callback
 from homeassistant.helpers.device_registry import DeviceInfo
-from homeassistant.helpers.entity import EntityDescription
+from homeassistant.helpers.entity import Entity, EntityDescription
+from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .api import Charger
 from .const import DOMAIN
-from .coordinator import EvlinkHomeCoordinator
+from .coordinator import EvlinkHomeConfigEntry, EvlinkHomeCoordinator
+
+
+@callback
+def async_add_wallbox_entities(
+    entry: EvlinkHomeConfigEntry,
+    async_add_entities: AddConfigEntryEntitiesCallback,
+    entities_of: Callable[[str], Iterable[Entity]],
+) -> None:
+    """Add the entities of each Wallbox, now and whenever the account gains one."""
+    coordinator = entry.runtime_data
+    known: set[str] = set()
+
+    @callback
+    def add_new_wallboxes() -> None:
+        new = coordinator.data.keys() - known
+        if not new:
+            return
+        known.update(new)
+        async_add_entities(
+            entity for device_id in new for entity in entities_of(device_id)
+        )
+
+    add_new_wallboxes()
+    entry.async_on_unload(coordinator.async_add_listener(add_new_wallboxes))
 
 
 class EvlinkHomeEntity(CoordinatorEntity[EvlinkHomeCoordinator]):

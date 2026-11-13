@@ -21,7 +21,7 @@ from homeassistant.util import dt as dt_util
 from .api import Charger
 from .const import STATUSES
 from .coordinator import EvlinkHomeConfigEntry, EvlinkHomeCoordinator
-from .entity import EvlinkHomeEntity
+from .entity import EvlinkHomeEntity, async_add_wallbox_entities
 
 PARALLEL_UPDATES = 0
 
@@ -80,16 +80,17 @@ async def async_setup_entry(
 ) -> None:
     """Add the sensors of every Wallbox of the account."""
     coordinator = entry.runtime_data
-    entities: list[SensorEntity] = []
-    for device_id in coordinator.data:
-        entities.extend(
-            EvlinkHomeSensor(coordinator, device_id, description)
-            for description in SENSORS
-        )
-        entities.append(
-            EvlinkHomeSessionEnergySensor(coordinator, device_id, SESSION_ENERGY)
-        )
-    async_add_entities(entities)
+
+    def sensors_of(device_id: str) -> list[SensorEntity]:
+        return [
+            *(
+                EvlinkHomeSensor(coordinator, device_id, description)
+                for description in SENSORS
+            ),
+            EvlinkHomeSessionEnergySensor(coordinator, device_id, SESSION_ENERGY),
+        ]
+
+    async_add_wallbox_entities(entry, async_add_entities, sensors_of)
 
 
 class EvlinkHomeSensor(EvlinkHomeEntity, SensorEntity):

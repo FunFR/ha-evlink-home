@@ -1,5 +1,6 @@
 """Tests for the EVlink Home config entry lifecycle, through Home Assistant."""
 
+import json
 from datetime import timedelta
 
 import aiohttp
@@ -8,11 +9,15 @@ from aioresponses import aioresponses
 from freezegun.api import FrozenDateTimeFactory
 from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     async_fire_time_changed,
     load_fixture,
 )
+
+from custom_components.evlink_home.const import DOMAIN
 
 from .common import DEVICE_ID, DEVICES_URL, LOGIN_URL, error_fixture, login_body
 
@@ -148,3 +153,38 @@ async def test_password_rejected_while_polling_asks_to_reauthenticate(
         "The Wiser Home cloud rejected the email or password"
     ) in caplog.text
     assert request_counts(cloud) == {f"POST {LOGIN_URL}": 3, f"GET {DEVICES_URL}": 2}
+
+
+SECOND_DEVICE_ID = "11111111-1111-4111-8111-111111111111"
+
+
+def second_wallbox_records() -> str:
+    records = json.loads(load_fixture("clouddevices.json"))
+    second = {**records[0], "deviceId": SECOND_DEVICE_ID, "name": "Garage"}
+    return json.dumps([*records, second])
+
+
+async def test_wallbox_added_to_the_account_gets_its_device_and_entities(
+    hass: HomeAssistant,
+    cloud: aioresponses,
+    loaded_entry: MockConfigEntry,
+    freezer: FrozenDateTimeFactory,
+) -> None:
+    cloud.get(DEVICES_URL, status=200, body=second_wallbox_records())
+    await poll(hass, freezer)
+
+    device = dr.async_get(hass).async_get_device_by_identifier(
+        (DOMAIN, SECOND_DEVICE_ID), loaded_entry.entry_id
+    )
+    assert device is not None
+    assert device.name == "Garage"
+    entities = er.async_entries_for_device(er.async_get(hass), device.id)
+    assert sorted(entity.entity_id for entity in entities) == [
+        "binary_sensor.garage_charging",
+        "binary_sensor.garage_plugged_in",
+        "sensor.garage_next_scheduled_end",
+        "sensor.garage_next_scheduled_start",
+        "sensor.garage_session_energy",
+        "sensor.garage_status",
+        "switch.garage_charging",
+    ]
