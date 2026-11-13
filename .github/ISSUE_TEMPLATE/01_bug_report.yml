@@ -13,7 +13,7 @@ body:
     id: version
     attributes:
       label: Integration Version
-      description: Shown in HACS, or on the integration page under **Settings** > **Devices & services** > **EVlink Home**.
+      description: Shown in the Marketplace or HACS, or on the integration page under **Settings** > **Devices & services** > **EVlink Home**.
       placeholder: 1.0.0
     validations:
       required: true
@@ -58,9 +58,7 @@ body:
     id: diagnostics
     attributes:
       label: Diagnostics
-      description: |
-        On the integration page, open the three dots menu, select **Download diagnostics**, and attach the file here.
-        The file hides your email, password, device identifiers, serial numbers and Wi-Fi settings.
+      description: On the integration page, open the three dots menu, select **Download diagnostics**, and attach the file here.
   - type: textarea
     id: logs
     attributes:
