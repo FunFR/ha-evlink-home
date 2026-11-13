@@ -32,6 +32,8 @@ Renovate maintains the repository on its own, so every change stays valid for mo
 
 ## Checks
 
+A ruleset protects `main`: changes land through a squash-merged pull request once `Test`, `Validate`, `HACS` and CodeQL pass, so the pull request title becomes the commit subject and drives release-drafter.
+
 `uv run pre-commit install` once, then `uv run pre-commit run --all-files` runs the local checks: ruff, mypy strict, pytest with coverage, zizmor and gitleaks. CI adds hassfest and the HACS validation.
 
 When behaviour changes, keep `quality_scale.yaml` and the README true to the code.
