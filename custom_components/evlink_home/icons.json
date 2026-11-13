@@ -1,5 +1,22 @@
 {
     "entity": {
+        "sensor": {
+            "next_scheduled_end": {
+                "default": "mdi:calendar-end"
+            },
+            "next_scheduled_start": {
+                "default": "mdi:calendar-start"
+            },
+            "status": {
+                "default": "mdi:ev-station",
+                "state": {
+                    "charging": "mdi:battery-charging",
+                    "error": "mdi:alert-circle-outline",
+                    "offline": "mdi:cloud-off-outline",
+                    "unplugged": "mdi:power-plug-off-outline"
+                }
+            }
+        },
         "switch": {
             "charging": {
                 "default": "mdi:ev-station",
