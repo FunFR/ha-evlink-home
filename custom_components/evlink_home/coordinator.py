@@ -50,6 +50,20 @@ class EvlinkHomeCoordinator(DataUpdateCoordinator[dict[str, Wallbox]]):
             entry.data[CONF_EMAIL],
             entry.data[CONF_PASSWORD],
         )
+        self._command_refreshes = 0
+
+    @property
+    def refreshing_after_command(self) -> bool:
+        """Whether the update in progress follows a command to a Wallbox."""
+        return self._command_refreshes > 0
+
+    async def async_refresh_after_command(self) -> None:
+        """Refresh right away, flagged as the follow-up of a command."""
+        self._command_refreshes += 1
+        try:
+            await self.async_refresh()
+        finally:
+            self._command_refreshes -= 1
 
     async def _async_setup(self) -> None:
         with _cloud_errors():

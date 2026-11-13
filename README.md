@@ -89,7 +89,7 @@ Status values: `charging`, `plugged_in`, `unplugged`, `schedule_paused`, `paused
 
 The integration polls the Wiser Home cloud every 30 seconds. The cloud itself refreshes the Wallbox's data about every 30 seconds, so a faster poll would not bring fresher values.
 
-After Start or Stop, the integration refreshes right away. The Wallbox usually follows a command within 2 to 10 seconds. Until the next poll, the Charging switch shows the state you requested.
+After Start or Stop, the integration refreshes right away. The Wallbox usually follows a command within 2 to 10 seconds. Until the next scheduled poll, the Charging switch shows the state you requested, even if a command to another Wallbox refreshes in between.
 
 When the cloud cannot be reached, the entities become unavailable and the integration logs one message. They come back on their own once the cloud answers, with one more message.
 

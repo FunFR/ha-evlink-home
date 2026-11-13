@@ -256,3 +256,60 @@ async def test_switch_is_named_charging(
     entity_id = await set_up(hass, cloud, entry, "Charging")
 
     assert hass.states.get(entity_id).name == "REDACTED_name Charging"
+
+
+GARAGE_ID = "11111111-1111-4111-8111-111111111111"
+
+
+def two_wallboxes_body(house: str, garage: str) -> str:
+    """The fixture Wallbox in ``house`` status and a Garage one in ``garage``."""
+    records = json.loads(load_fixture("clouddevices.json"))
+    records[0]["status"] = house
+    garage_record = {**records[0], "deviceId": GARAGE_ID, "name": "Garage"}
+    garage_record["status"] = garage
+    return json.dumps([records[0], garage_record])
+
+
+def switch_of(hass: HomeAssistant, device_id: str) -> str:
+    entity_id = er.async_get(hass).async_get_entity_id(
+        "switch", "evlink_home", f"{device_id}_charging"
+    )
+    assert entity_id is not None
+    return entity_id
+
+
+async def test_command_on_another_wallbox_keeps_the_requested_state(
+    hass: HomeAssistant,
+    cloud: aioresponses,
+    entry: MockConfigEntry,
+    freezer: FrozenDateTimeFactory,
+) -> None:
+    cloud.post(LOGIN_URL, status=200, body=login_body())
+    cloud.get(DEVICES_URL, status=200, body=two_wallboxes_body("Charging", "Unplugged"))
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+    house, garage = switch_of(hass, DEVICE_ID), switch_of(hass, GARAGE_ID)
+    cloud.patch(STOP_URL, status=204, repeat=True)
+    cloud.get(
+        DEVICES_URL,
+        status=200,
+        body=two_wallboxes_body("Charging", "Charging"),
+        repeat=True,
+    )
+
+    await hass.services.async_call(
+        "switch", SERVICE_TURN_OFF, {ATTR_ENTITY_ID: house}, blocking=True
+    )
+    await hass.services.async_call(
+        "switch", SERVICE_TURN_OFF, {ATTR_ENTITY_ID: garage}, blocking=True
+    )
+
+    assert hass.states.get(house).state == STATE_OFF
+    assert hass.states.get(garage).state == STATE_OFF
+
+    freezer.tick(timedelta(seconds=30))
+    async_fire_time_changed(hass)
+    await hass.async_block_till_done()
+
+    assert hass.states.get(house).state == STATE_ON
+    assert hass.states.get(garage).state == STATE_ON
