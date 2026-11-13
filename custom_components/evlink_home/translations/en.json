@@ -22,6 +22,18 @@
                 "data_description": {
                     "password": "The password of your Wiser Home account."
                 }
+            },
+            "reconfigure": {
+                "title": "Update the Wiser Home credentials",
+                "description": "Enter the credentials of the same Wiser Home account.",
+                "data": {
+                    "email": "Email",
+                    "password": "Password"
+                },
+                "data_description": {
+                    "email": "The email address of your Wiser Home account.",
+                    "password": "The password of your Wiser Home account."
+                }
             }
         },
         "error": {

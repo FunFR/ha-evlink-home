@@ -180,3 +180,78 @@ async def test_reauth_aborts_on_another_account(
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "wrong_account"
     assert mock_entry.data[CONF_PASSWORD] == PASSWORD
+
+
+async def test_reconfigure_updates_the_credentials(
+    hass: HomeAssistant, mock_client: MagicMock, mock_entry: MockConfigEntry
+) -> None:
+    result = await mock_entry.start_reconfigure_flow(hass)
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "reconfigure"
+    suggested = {
+        str(key): key.description["suggested_value"]
+        for key in result["data_schema"].schema
+        if key.description
+    }
+    assert suggested == {CONF_EMAIL: EMAIL}
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_EMAIL: "alias@example.com", CONF_PASSWORD: "new-secret"},
+    )
+
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reconfigure_successful"
+    assert mock_entry.data == {
+        CONF_EMAIL: "alias@example.com",
+        CONF_PASSWORD: "new-secret",
+    }
+    assert len(hass.config_entries.async_entries(DOMAIN)) == 1
+
+
+@pytest.mark.parametrize(
+    ("exception", "error"),
+    [
+        (InvalidCredentialsError, "invalid_auth"),
+        (CannotConnectError, "cannot_connect"),
+        (RuntimeError, "unknown"),
+    ],
+)
+async def test_reconfigure_shows_error_then_recovers(
+    hass: HomeAssistant,
+    mock_client: MagicMock,
+    mock_entry: MockConfigEntry,
+    exception: Exception,
+    error: str,
+) -> None:
+    result = await mock_entry.start_reconfigure_flow(hass)
+    mock_client.return_value.login.side_effect = exception
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_EMAIL: EMAIL, CONF_PASSWORD: "new-secret"}
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {"base": error}
+
+    mock_client.return_value.login.side_effect = None
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_EMAIL: EMAIL, CONF_PASSWORD: "new-secret"}
+    )
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reconfigure_successful"
+
+
+async def test_reconfigure_aborts_on_another_account(
+    hass: HomeAssistant, mock_client: MagicMock, mock_entry: MockConfigEntry
+) -> None:
+    result = await mock_entry.start_reconfigure_flow(hass)
+    mock_client.return_value.login.return_value = "account-2"
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_EMAIL: "other@example.com", CONF_PASSWORD: "other-secret"},
+    )
+
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "wrong_account"
+    assert mock_entry.data == {CONF_EMAIL: EMAIL, CONF_PASSWORD: PASSWORD}
