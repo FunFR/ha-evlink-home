@@ -10,14 +10,9 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
-from .api import (
-    CannotConnectError,
-    InvalidCredentialsError,
-    WallboxStatus,
-    WiserHomeError,
-)
+from .api import WallboxStatus, WiserHomeError
 from .const import DOMAIN
-from .coordinator import EvlinkHomeConfigEntry
+from .coordinator import EvlinkHomeConfigEntry, error_translation_key
 from .entity import EvlinkHomeEntity, async_add_wallbox_entities
 
 PARALLEL_UPDATES = 1
@@ -25,11 +20,6 @@ PARALLEL_UPDATES = 1
 CHARGING = SwitchEntityDescription(key="charging", translation_key="charging")
 
 _CHARGING_STATUSES = frozenset({WallboxStatus.CHARGING, WallboxStatus.SUSPENDED_EV})
-
-_ERROR_KEYS: dict[type[WiserHomeError], str] = {
-    CannotConnectError: "cannot_connect",
-    InvalidCredentialsError: "invalid_credentials",
-}
 
 
 async def async_setup_entry(
@@ -77,7 +67,7 @@ class EvlinkHomeChargingSwitch(EvlinkHomeEntity, SwitchEntity):
         except WiserHomeError as err:
             raise HomeAssistantError(
                 translation_domain=DOMAIN,
-                translation_key=_ERROR_KEYS.get(type(err), "unexpected_response"),
+                translation_key=error_translation_key(err),
             ) from err
         self._requested = requested
         self.async_write_ha_state()
