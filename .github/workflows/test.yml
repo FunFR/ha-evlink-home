@@ -69,4 +69,4 @@ jobs:
       - name: Scan dev dependencies for known vulnerabilities
         run: |
           uv export --only-group dev --no-hashes --no-emit-project -o requirements-audit.txt
-          uv run pip-audit -r requirements-audit.txt --disable-pip --no-deps
+          uv run --frozen pip-audit -r requirements-audit.txt --disable-pip --no-deps
