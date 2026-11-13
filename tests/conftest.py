@@ -46,7 +46,8 @@ def auto_enable_custom_integrations(
 
 @pytest.fixture
 def cloud() -> Generator[aioresponses]:
-    with aioresponses() as mock:
+    """Mocked cloud that lets the test client reach the local Home Assistant."""
+    with aioresponses(passthrough=["http://127.0.0.1"]) as mock:
         yield mock
 
 
