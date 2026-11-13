@@ -115,3 +115,68 @@ async def test_user_aborts_when_account_already_configured(
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "already_configured"
     assert len(hass.config_entries.async_entries(DOMAIN)) == 1
+
+
+async def test_reauth_updates_the_password(
+    hass: HomeAssistant, mock_client: MagicMock, mock_entry: MockConfigEntry
+) -> None:
+    result = await mock_entry.start_reauth_flow(hass)
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "reauth_confirm"
+    assert result["description_placeholders"][CONF_EMAIL] == EMAIL
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_PASSWORD: "new-secret"}
+    )
+
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reauth_successful"
+    assert mock_entry.data == {CONF_EMAIL: EMAIL, CONF_PASSWORD: "new-secret"}
+    assert mock_client.call_args.args[1:] == (EMAIL, "new-secret")
+
+
+@pytest.mark.parametrize(
+    ("exception", "error"),
+    [
+        (InvalidCredentialsError, "invalid_auth"),
+        (CannotConnectError, "cannot_connect"),
+        (RuntimeError, "unknown"),
+    ],
+)
+async def test_reauth_shows_error_then_recovers(
+    hass: HomeAssistant,
+    mock_client: MagicMock,
+    mock_entry: MockConfigEntry,
+    exception: Exception,
+    error: str,
+) -> None:
+    result = await mock_entry.start_reauth_flow(hass)
+    mock_client.return_value.login.side_effect = exception
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_PASSWORD: "new-secret"}
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {"base": error}
+
+    mock_client.return_value.login.side_effect = None
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_PASSWORD: "new-secret"}
+    )
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reauth_successful"
+
+
+async def test_reauth_aborts_on_another_account(
+    hass: HomeAssistant, mock_client: MagicMock, mock_entry: MockConfigEntry
+) -> None:
+    result = await mock_entry.start_reauth_flow(hass)
+    mock_client.return_value.login.return_value = "account-2"
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_PASSWORD: "new-secret"}
+    )
+
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "wrong_account"
+    assert mock_entry.data[CONF_PASSWORD] == PASSWORD
