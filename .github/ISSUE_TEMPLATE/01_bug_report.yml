@@ -1,0 +1,70 @@
+name: Bug Report
+description: Report a problem with the integration or a Wallbox
+title: "[BUG] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a problem. The [troubleshooting section](https://github.com/FunFR/ha-evlink-home#troubleshooting) of the README covers the most common cases.
+
+        **Never post passwords, access tokens, email addresses, serial numbers or device identifiers.** The diagnostics file hides them, but debug logs and screenshots may not: read them before posting.
+  - type: input
+    id: version
+    attributes:
+      label: Integration Version
+      description: Shown in HACS, or on the integration page under **Settings** > **Devices & services** > **EVlink Home**.
+      placeholder: 1.0.0
+    validations:
+      required: true
+  - type: input
+    id: ha_version
+    attributes:
+      label: Home Assistant Version
+      description: Found under **Settings** > **About**.
+      placeholder: YYYY.M.PATCH
+    validations:
+      required: true
+  - type: input
+    id: firmware
+    attributes:
+      label: Wallbox Firmware
+      description: Shown on the Wallbox device page in Home Assistant. Leave empty if setup fails.
+  - type: input
+    id: status
+    attributes:
+      label: Status Shown
+      description: Value of the Wallbox's **Status** sensor when the problem happens, and what the Wiser Home app shows at the same time if it differs. Leave empty if setup fails.
+      placeholder: "Status: Plugged in, Wiser Home app: Charging"
+  - type: textarea
+    id: what_happened
+    attributes:
+      label: Description
+      description: What happened, and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction Steps
+      description: Steps to reproduce the problem, including the state of the Charge session (car plugged in or not, after a Start or a Stop).
+      placeholder: |
+        1. Plug in the car
+        2. Turn on the Charging switch
+        3. See error
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics
+      description: |
+        On the integration page, open the three dots menu, select **Download diagnostics**, and attach the file here.
+        The file hides your email, password, device identifiers, serial numbers and Wi-Fi settings.
+  - type: textarea
+    id: logs
+    attributes:
+      label: Debug Logs
+      description: |
+        On the integration page, select **Enable debug logging**, reproduce the problem, then select **Disable debug logging**: Home Assistant downloads the log. Attach the file here.
+        Debug logs are not filtered: remove any email address, token or serial number before posting.
