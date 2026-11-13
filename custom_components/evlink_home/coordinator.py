@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from collections.abc import Iterator
 from contextlib import contextmanager
@@ -24,6 +25,9 @@ from .api import (
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
+
+_POLL_TIMEOUT = 30
+"""Seconds one poll may take, token renewal and retried call included."""
 
 type EvlinkHomeConfigEntry = ConfigEntry[EvlinkHomeCoordinator]
 
@@ -53,7 +57,8 @@ class EvlinkHomeCoordinator(DataUpdateCoordinator[dict[str, Wallbox]]):
 
     async def _async_update_data(self) -> dict[str, Wallbox]:
         with _cloud_errors():
-            wallboxes = await self.client.get_wallboxes()
+            async with asyncio.timeout(_POLL_TIMEOUT):
+                wallboxes = await self.client.get_wallboxes()
         return {wallbox.device_id: wallbox for wallbox in wallboxes}
 
 
@@ -80,4 +85,8 @@ def _cloud_errors() -> Iterator[None]:
     except WiserHomeError as err:
         raise UpdateFailed(
             translation_domain=DOMAIN, translation_key=error_translation_key(err)
+        ) from err
+    except TimeoutError as err:
+        raise UpdateFailed(
+            translation_domain=DOMAIN, translation_key="cannot_connect"
         ) from err
