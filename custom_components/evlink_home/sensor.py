@@ -18,8 +18,7 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.typing import StateType
 from homeassistant.util import dt as dt_util
 
-from .api import Wallbox
-from .const import STATUSES
+from .api import Wallbox, WallboxStatus
 from .coordinator import EvlinkHomeConfigEntry, EvlinkHomeCoordinator
 from .entity import EvlinkHomeEntity, async_add_wallbox_entities
 
@@ -45,8 +44,8 @@ SENSORS: tuple[EvlinkHomeSensorEntityDescription, ...] = (
         key="status",
         translation_key="status",
         device_class=SensorDeviceClass.ENUM,
-        options=list(STATUSES.values()),
-        value_fn=lambda wallbox: STATUSES.get(wallbox.status),
+        options=[status.value for status in WallboxStatus],
+        value_fn=lambda wallbox: wallbox.status,
     ),
     EvlinkHomeSensorEntityDescription(
         key="next_scheduled_start",

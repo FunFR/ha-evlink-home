@@ -20,6 +20,7 @@ from pytest_homeassistant_custom_component.common import (
 )
 from pytest_homeassistant_custom_component.typing import WebSocketGenerator
 
+from custom_components.evlink_home.api import WallboxStatus
 from custom_components.evlink_home.const import DOMAIN
 
 from .common import DEVICE_ID, DEVICES_URL, LOGIN_URL, error_fixture, login_body
@@ -57,7 +58,7 @@ async def test_entry_loads_the_wallboxes_and_unloads(
     assert await hass.config_entries.async_setup(entry.entry_id)
     assert entry.state is ConfigEntryState.LOADED
     wallbox = entry.runtime_data.data[DEVICE_ID]
-    assert wallbox.status == "SchedulePaused"
+    assert wallbox.status is WallboxStatus.SCHEDULE_PAUSED
     assert wallbox.model == "EVH4A07N400F"
 
     assert await hass.config_entries.async_unload(entry.entry_id)

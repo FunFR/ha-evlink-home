@@ -10,7 +10,12 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
-from .api import CannotConnectError, InvalidCredentialsError, WiserHomeError
+from .api import (
+    CannotConnectError,
+    InvalidCredentialsError,
+    WallboxStatus,
+    WiserHomeError,
+)
 from .const import DOMAIN
 from .coordinator import EvlinkHomeConfigEntry
 from .entity import EvlinkHomeEntity, async_add_wallbox_entities
@@ -19,7 +24,7 @@ PARALLEL_UPDATES = 1
 
 CHARGING = SwitchEntityDescription(key="charging", translation_key="charging")
 
-_CHARGING_STATUSES = frozenset({"Charging", "SuspendedEv"})
+_CHARGING_STATUSES = frozenset({WallboxStatus.CHARGING, WallboxStatus.SUSPENDED_EV})
 
 _ERROR_KEYS: dict[type[WiserHomeError], str] = {
     CannotConnectError: "cannot_connect",
@@ -54,7 +59,7 @@ class EvlinkHomeChargingSwitch(EvlinkHomeEntity, SwitchEntity):
         return self.wallbox.status in _CHARGING_STATUSES
 
     async def async_turn_on(self, **kwargs: Any) -> None:
-        if self.wallbox.status == "Unplugged":
+        if self.wallbox.status is WallboxStatus.UNPLUGGED:
             raise ServiceValidationError(
                 translation_domain=DOMAIN, translation_key="no_car_plugged_in"
             )
