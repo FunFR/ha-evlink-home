@@ -39,13 +39,23 @@ The integration creates one device per Wallbox of the account. Several Wallboxes
 
 Requires Home Assistant 2026.10.0 or later, a Wiser Home account, and a Wallbox already set up in the Wiser Home app.
 
-### HACS (recommended)
+EVlink Home is not in the Marketplace catalog yet: add this repository as a custom repository of the **Integration** category. This button opens it in the Marketplace on Home Assistant 2026.11 or later, and in HACS on older versions:
 
-1. Open HACS in your Home Assistant instance.
-2. Click the three dots in the top right corner and select **Custom repositories**.
-3. Add the URL of this repository and select **Integration** as the type.
-4. Install the **EVlink Home** integration.
-5. Restart Home Assistant.
+[![Open your Home Assistant instance and open this repository.][repository-badge]][repository-link]
+
+### Marketplace (Home Assistant 2026.11 or later)
+
+Adding a custom repository needs a GitHub connection. If the Marketplace is not connected yet, it asks you to connect GitHub with a code on the way.
+
+1. Select the button above and confirm adding the repository. Without the button: go to **Settings** > **Marketplace**, select **Add from link**, enter `https://github.com/FunFR/ha-evlink-home` and select **Add**.
+2. On the **EVlink Home** page, select **Install**, then **Install** again.
+3. If a repair asks for a restart, restart Home Assistant.
+
+### HACS (Home Assistant 2026.10)
+
+1. Select the button above and confirm adding the repository. Without the button: open HACS, click the three dots in the top right corner, select **Custom repositories**, add `https://github.com/FunFR/ha-evlink-home` with the **Integration** type.
+2. Download the **EVlink Home** integration.
+3. Restart Home Assistant.
 
 ### Manual
 
@@ -176,7 +186,7 @@ Enable debug logging from the integration page (**Enable debug logging**), repro
 
 1. Go to **Settings** > **Devices & services** and select **EVlink Home**.
 2. Click the three dots next to the entry and select **Delete**.
-3. If you installed it with HACS, remove the integration from HACS and restart Home Assistant.
+3. If you installed it from the Marketplace, open its page there and select **Uninstall** from the three dots menu. If you installed it with HACS, remove it from HACS and restart Home Assistant.
 
 Removing the integration deletes the stored credentials. The Wallbox and the Wiser Home app are not affected.
 
@@ -202,3 +212,5 @@ This is an unofficial integration, not affiliated with or endorsed by Schneider 
 [release-workflow-shield]: https://github.com/FunFR/ha-evlink-home/actions/workflows/release.yml/badge.svg
 [add-integration]: https://my.home-assistant.io/redirect/config_flow_start/?domain=evlink_home
 [add-integration-badge]: https://my.home-assistant.io/badges/config_flow_start.svg
+[repository-link]: https://my.home-assistant.io/redirect/hacs_repository/?owner=FunFR&repository=ha-evlink-home&category=integration
+[repository-badge]: https://my.home-assistant.io/badges/hacs_repository.svg
