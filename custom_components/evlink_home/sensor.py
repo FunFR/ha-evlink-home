@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from homeassistant.components.sensor import (
+    RestoreSensor,
     SensorDeviceClass,
     SensorEntity,
     SensorEntityDescription,
@@ -102,11 +103,11 @@ class EvlinkHomeSensor(EvlinkHomeEntity, SensorEntity):
         return self.entity_description.value_fn(self.wallbox)
 
 
-class EvlinkHomeSessionEnergySensor(EvlinkHomeEntity, SensorEntity):
+class EvlinkHomeSessionEnergySensor(EvlinkHomeEntity, RestoreSensor):
     """Energy of the Charge session, kept while the cloud reports none.
 
-    The cloud forgets the total once the car is unplugged. Keeping it lets
-    the next session's lower total read as a meter reset.
+    The cloud forgets the total once the car is unplugged. Keeping it, also
+    across restarts, lets the next session's lower total read as a meter reset.
     """
 
     def __init__(
@@ -117,6 +118,13 @@ class EvlinkHomeSessionEnergySensor(EvlinkHomeEntity, SensorEntity):
     ) -> None:
         super().__init__(coordinator, device_id, description)
         self._attr_native_value = self.wallbox.session_energy_kwh
+
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+        if self._attr_native_value is None and (
+            last := await self.async_get_last_sensor_data()
+        ):
+            self._attr_native_value = last.native_value
 
     @callback
     def _handle_coordinator_update(self) -> None:
