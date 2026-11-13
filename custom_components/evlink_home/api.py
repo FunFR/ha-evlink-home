@@ -67,7 +67,7 @@ class _Token:
 
 
 @dataclass(frozen=True, slots=True)
-class Charger:
+class Wallbox:
     """One Wallbox as the cloud reports it."""
 
     device_id: str
@@ -162,7 +162,7 @@ class WiserHomeClient:
         except (ValueError, KeyError, TypeError) as err:
             raise UnexpectedResponseError("Login answer has no usable token") from err
 
-    async def get_chargers(self) -> list[Charger]:
+    async def get_wallboxes(self) -> list[Wallbox]:
         """Return every Wallbox of the account."""
         text = await self._api_request("GET", DEVICES_URL)
         try:
@@ -170,7 +170,7 @@ class WiserHomeClient:
             if not isinstance(records, list):
                 raise TypeError("not a list")
             return [
-                _charger(record)
+                _wallbox(record)
                 for record in records
                 if record.get("productType") == "EvCharger"
             ]
@@ -250,9 +250,9 @@ def _error_code(text: str) -> object:
     return body.get("error") if isinstance(body, dict) else None
 
 
-def _charger(record: Mapping[str, Any]) -> Charger:
+def _wallbox(record: Mapping[str, Any]) -> Wallbox:
     energy = record.get("energyUsageKwh")
-    return Charger(
+    return Wallbox(
         device_id=str(record["deviceId"]),
         name=str(record["name"]),
         model=record.get("modelIdentifier"),

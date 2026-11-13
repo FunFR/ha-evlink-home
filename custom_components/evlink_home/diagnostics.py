@@ -34,8 +34,8 @@ async def async_get_config_entry_diagnostics(
     """Return the config entry and the cloud record of each Wallbox."""
     return {
         "entry": async_redact_data(entry.as_dict(), TO_REDACT),
-        "chargers": [
-            async_redact_data(charger.raw, TO_REDACT)
-            for charger in entry.runtime_data.data.values()
+        "wallboxes": [
+            async_redact_data(wallbox.raw, TO_REDACT)
+            for wallbox in entry.runtime_data.data.values()
         ],
     }

@@ -51,10 +51,10 @@ class EvlinkHomeChargingSwitch(EvlinkHomeEntity, SwitchEntity):
     def is_on(self) -> bool:
         if self._requested is not None:
             return self._requested
-        return self.charger.status in _CHARGING_STATUSES
+        return self.wallbox.status in _CHARGING_STATUSES
 
     async def async_turn_on(self, **kwargs: Any) -> None:
-        if self.charger.status == "Unplugged":
+        if self.wallbox.status == "Unplugged":
             raise ServiceValidationError(
                 translation_domain=DOMAIN, translation_key="no_car_plugged_in"
             )

@@ -1,7 +1,28 @@
 # serializer version: 1
 # name: test_diagnostics_hide_the_account_and_the_wallbox_identity
   dict({
-    'chargers': list([
+    'entry': dict({
+      'data': dict({
+        'email': '**REDACTED**',
+        'password': '**REDACTED**',
+      }),
+      'disabled_by': None,
+      'discovery_keys': dict({
+      }),
+      'domain': 'evlink_home',
+      'minor_version': 1,
+      'options': dict({
+      }),
+      'pref_disable_new_entities': False,
+      'pref_disable_polling': False,
+      'source': 'user',
+      'subentries': list([
+      ]),
+      'title': '**REDACTED**',
+      'unique_id': '**REDACTED**',
+      'version': 1,
+    }),
+    'wallboxes': list([
       dict({
         'authorisationStatus': False,
         'authorisedModeSupported': False,
@@ -161,26 +182,5 @@
         'wiFiSsid': '**REDACTED**',
       }),
     ]),
-    'entry': dict({
-      'data': dict({
-        'email': '**REDACTED**',
-        'password': '**REDACTED**',
-      }),
-      'disabled_by': None,
-      'discovery_keys': dict({
-      }),
-      'domain': 'evlink_home',
-      'minor_version': 1,
-      'options': dict({
-      }),
-      'pref_disable_new_entities': False,
-      'pref_disable_polling': False,
-      'source': 'user',
-      'subentries': list([
-      ]),
-      'title': '**REDACTED**',
-      'unique_id': '**REDACTED**',
-      'version': 1,
-    }),
   })
 # ---

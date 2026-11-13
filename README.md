@@ -142,7 +142,7 @@ automation:
 
 - **Cloud dependency.** Everything goes through the Wiser Home cloud: the integration needs an internet connection and stops working if the service is down, changes, or is shut down.
 - **Stop shows as `schedule_paused`.** After a Stop, the cloud reports the `schedule_paused` status, not `stopped`.
-- **No Disable.** The integration cannot keep the Wallbox from charging when a car is plugged in: the Wallbox follows its own schedule and the Wiser Home app's settings. Turning the switch off stops the current charge only.
+- **No Disable.** The integration cannot keep the Wallbox from charging when a car is plugged in: the Wallbox follows its own schedule and the Wiser Home app's settings. Turning the switch off stops charging while the Charge session goes on, so the Wallbox may charge again on its own schedule.
 - **Read-only schedule.** The schedule and the charging mode are read from the Wiser Home app and cannot be changed from Home Assistant. Charge history and cost are not available.
 - **Wallbox time zone.** The cloud sends scheduled times without a time zone. The integration assumes the Wallbox is in Home Assistant's time zone.
 - **Session energy after a restart.** After Home Assistant restarts, Session energy stays unknown while no car is plugged in.

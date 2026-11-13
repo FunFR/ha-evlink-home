@@ -31,7 +31,7 @@ async def test_entity_belongs_to_its_wallbox_device(
         sw_version="2.0.7.0.0_f135",
         serial_number="REDACTED_serialNumber",
     )
-    assert entity.charger.status == "SchedulePaused"
+    assert entity.wallbox.status == "SchedulePaused"
     assert entity.available
 
 
